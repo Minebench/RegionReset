@@ -1,12 +1,9 @@
 package io.github.apfelcreme.RegionReset;
 
-import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Copyright (C) 2016 Lord36 aka Apfelcreme
