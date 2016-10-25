@@ -1,0 +1,72 @@
+texts:
+  prefix: '&7[&8RR&7]'
+  error:
+    differentSize: '&c Die Region {0} und der Blueprint {1} haben nicht die gleiche Größe!'
+    duplicateBlueprintName: '&c Es existiert bereits ein Blueprint mit dem Namen {0}!'
+    noBackupFound: '&c Für die Region {0} wurde kein Backup gefunden!'
+    noCuboidRegion: '&c Die gewählte Region muss vom Typ CUBOID sein!'
+    noCuboidSelection: '&c Die getroffene Auswahl muss vom Typ CUBOID sein!'
+    noPermission: '&c Du hast keine ausreichende Berechtigung!'
+    noSelection: '&c Du hast noch keine Auswahl mit WorldEdit getroffen!'
+    regionNotAssigned: '&c Die Region wurde keinem Blueprint zugeordnet!'
+    unknownBlueprint: '&c Der Blueprint {0} existiert nicht!'
+    unknownException: '&c Es ist ein unerwartetet Fehler aufgetreten: {0}!'
+    unknownCommand: '&c Die Funktion {0} existiert nicht!'
+    unknownRegion: '&c Die Region {0} existiert nicht!'
+    wrongUsage: '&c Falsche Eingabe: Probiere {0}!'
+  info:
+    add:
+      added: '&a Du hast die Region &2{0}&a erfolgreich kategorisiert'
+    blueprints:
+      header: '&a Alle Blueprints: '
+      worldHeader: '&2 {0}&8:'
+      element: '&7 - {0} &8[{1} Regionen]'
+    check:
+      header: '&a Alle Regionen des Blueprints &2{0}&a, deren Eigner seit &2{1}&a Tagen offline sind: &2(&a{2]&2/&a{3}&2)'
+      element: '&8 - &2{0}: &c&o/rr reset {1}'
+      footer: '&a Für andere Seiten: &2/rr list <Blueprint> <#>'
+    checkDetail:
+      header: '&a Alle Regionen des Blueprints &2{0}&a, deren Eigner seit &2{1}&a Tagen offline sind: &2(&a{2}&2/&a{3}&2)'
+      member: '&8   - &7{0}: &8{1}'
+      name: '&2{0} &8{1}'
+      region1: '&8 - &2{0}: &aBereit zum Reset'
+      region2: '&8 - &2{0}: &cNicht bereit zum Reset'
+      region3: '&8 - &2{0}: &7Keine Owner/Member'
+      footer: '&a Für andere Seiten: &2/rr list <Blueprint> <#>'
+    define:
+      defined: '&a Du hast den Blueprint &2{0}&a erfolgreich definiert'
+    delete:
+      deleted: '&a Du hast den Blueprint &2{0}&a erfolgreich gelöscht'
+    help:
+      header: '&a Folgende Commands stehen dir zur Verfügung: '
+      command:
+        add: '&8 - &2add <Region> <Blueprint>: &aWeist eine Region einem BP zu'
+        blueprints: '&8 - &2blueprints: &aZeigt eine Liste aller Blueprints'
+        check: '&8 - &2check <Blueprint>: &aZeigt Regionen & Status eines BPs'
+        checkdetail: '&8 - &2checkdetail <Blueprint>: &aZeigt detailierten Check'
+        define: '&8 - &2define <Name>: &aDefiniert einen neuen Blueprint'
+        delete: '&8 - &2delete <Blueprint>: &a Löscht ein Blueprint'
+        help: '&8 - &2help: &aZeigt die Liste aller Commands'
+        info: '&8 - &2info <Region>: &aZeigt Informationen zur Region an'
+        list: '&8 - &2list <Blueprint>: &aZeigt die Liste der Regionen eines BPs'
+        reload: '&8 - &2reload: &aLädt die Config neu'
+        reset: '&8 - &2reset <Region>: &aSetzt die Region auf den BP zurück'
+        restore: '&8 - &2restore <Region>: &a Macht den letzten Reset rückgängig'
+        save: '&8 - &2save <Region>: &aErstellt ein Backup einer Region'
+    info:
+      info: '&a Die Region &2{0}&a ist dem Blueprint &2{1}&a zugeordnet'
+      member: '&8 - &7{0}: &8{1}'
+      unknown: '&8unbekannt'
+    list:
+      header: '&a Regionen, welche &2{0}&a zugeordnet sind: &2(&a{1}&2/&a{2}&2) '
+      element: '&8 - &2{0} '
+      footer: '&a Für andere Seiten: &2/rr list <Blueprint> <#>'
+    reload:
+      reloaded: '&a Die Configs wurden neu geladen'
+    reset:
+      reset: '&a Die Region &2{0}&a wurde erfolgreich zurückgesetzt. Ein Backup wurde unter dem Namen &2{1}&a angelegt'
+    restore:
+      restored: '&a Der letzte Reset der Region &2{0}&a wurde rückgängig gemacht'
+    rightClick: '&eApplicable blueprint for region {0}: {1}'
+    save:
+      saved: '&a Die Region &2{0}&a wurde erfolgreich gespeichert. Du kannst sie jederzeit mit /rr restore <Region> zurücksetzen!'

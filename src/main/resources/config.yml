@@ -1,0 +1,11 @@
+# the number of days which are used to decide if a player is inactive
+resetLimit: 90
+
+# the page size for /rr list and so on
+pageSize: 5
+
+# the url that is used to fetch player uuids
+nameToUUIDUrl: 'https://api.mojang.com/users/profiles/minecraft/{0}'
+
+# the url that is used to fetch player names
+uuidToNameUrl: 'https://api.mojang.com/user/profiles/{0}/names'

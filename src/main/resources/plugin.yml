@@ -1,0 +1,50 @@
+name: RegionReset
+version: 1.0
+main: io.github.apfelcreme.RegionReset.RegionReset
+depend: [WorldGuard, WorldEdit]
+softdepend: [UUIDDB]
+
+commands:
+   rr:
+      description: Ersetzt die angegebene Region mit einem definierten blueprint.
+      usage:
+      permission:
+      permission-message:
+permissions: 
+  RegionReset.*:
+    description: All
+    children:
+      RegionReset.mod: true
+  RegionReset.mod:
+    description: package of all permissions
+    children: 
+      RegionReset.add: true
+      RegionReset.check: true
+      RegionReset.checkDetail: true
+      RegionReset.define: true
+      RegionReset.info: true
+      RegionReset.list: true
+      RegionReset.reload: true
+      RegionReset.reset: true
+      RegionReset.restore: true
+      RegionReset.save: true
+  RegionReset.add:
+    description: add a region to a blueprint
+  RegionReset.check:
+    description: show a list of all regions of a blueprint and their status
+  RegionReset.checkDetail:
+    description: show a list of all regions of a blueprint and their owners and members
+  RegionReset.define:
+    description: define a blueprint
+  RegionReset.info:
+    description: show the blueprint that is assigned to a region
+  RegionReset.list:
+    description: list all regions that are assigned to a blueprint
+  RegionReset.reload:
+    description: reload the configs
+  RegionReset.reset:
+    description: reset a region
+  RegionReset.restore:
+    description: restore a region to a blueprint
+  RegionReset.save:
+    description: saves a region
