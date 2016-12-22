@@ -1,14 +1,11 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionType;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.Exceptions.*;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -70,6 +67,8 @@ public class ResetCommand implements SubCommand {
                                     .replace("{1}", e.getBlueprintName()));
                         } catch (NonCuboidRegionException e) {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noCuboidRegion"));
+                        } catch (ChunkNotLoadedException e) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
                         }
                     } else {
                         RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));

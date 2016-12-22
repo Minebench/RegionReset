@@ -1,6 +1,7 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.NonCuboidSelectionException;
 import io.github.apfelcreme.RegionReset.Exceptions.UnknownException;
 import io.github.apfelcreme.RegionReset.RegionManager;
@@ -55,7 +56,8 @@ public class DefineCommand implements SubCommand {
                             e.printStackTrace();
                         } catch (NonCuboidSelectionException e) {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noCuboidSelection"));
-                            e.printStackTrace();
+                        } catch (ChunkNotLoadedException e) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
                         }
                     } else {
                         RegionReset.sendMessage(sender, RegionResetConfig.getText("error.duplicateBlueprintName")

@@ -2,6 +2,7 @@ package io.github.apfelcreme.RegionReset.Commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.NonCuboidRegionException;
 import io.github.apfelcreme.RegionReset.Exceptions.UnknownException;
 import io.github.apfelcreme.RegionReset.RegionManager;
@@ -58,6 +59,8 @@ public class SaveCommand implements SubCommand {
                         e.printStackTrace();
                     } catch (NonCuboidRegionException e) {
                         RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noCuboidRegion"));
+                    } catch (ChunkNotLoadedException e) {
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
                     }
                 } else {
                     RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")

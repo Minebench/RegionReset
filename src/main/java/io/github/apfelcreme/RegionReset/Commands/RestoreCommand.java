@@ -1,8 +1,8 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
+import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
 import io.github.apfelcreme.RegionReset.Exceptions.UnknownException;
 import io.github.apfelcreme.RegionReset.RegionManager;
@@ -67,6 +67,8 @@ public class RestoreCommand implements SubCommand {
                                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.differentSize")
                                         .replace("{0}", e.getRegionName())
                                         .replace("{1}", e.getBlueprintName()));
+                            } catch (ChunkNotLoadedException e) {
+                                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
                             }
                         } else {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noBackupFound")

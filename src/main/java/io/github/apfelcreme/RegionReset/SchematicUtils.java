@@ -8,8 +8,11 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
 import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -50,9 +53,12 @@ public class SchematicUtils {
      * @param noAir         should air be pastet or not? (default = false)
      * @param region        the region the schematic shall be pasted into
      * @param world         the world the schematic is in
+     * @throws DifferentRegionSizeException
+     * @throws ChunkNotLoadedException
      */
     public static void pasteBlueprint(final File schematicFile, final boolean noAir,
-                                      final ProtectedRegion region, final World world) throws DifferentRegionSizeException {
+                                      final ProtectedRegion region, final World world)
+            throws DifferentRegionSizeException, ChunkNotLoadedException {
         try {
             final EditSession editSession = new EditSession(new BukkitWorld(world), Integer.MAX_VALUE);
             SchematicFormat schematic = SchematicFormat
@@ -84,6 +90,11 @@ public class SchematicUtils {
                                 }
                                 if (noAir && block.isAir()) {
                                     continue;
+                        if (!world.isChunkLoaded(region.getMinimumPoint()
+                                .getBlockX() + x >> 4, region.getMinimumPoint()
+                                .getBlockZ() + z >> 4)) {
+                            throw new ChunkNotLoadedException();
+                        }
 
                                 }
 
@@ -120,15 +131,17 @@ public class SchematicUtils {
      * @param schematicFile the file that contains the schematic
      * @param region        the region that shall be saved
      * @param world         the world that the region is in
-     * @throws FileNotFoundException
      * @throws IOException
      * @throws EmptyClipboardException
      * @throws DataException
+     * @throws ChunkNotLoadedException
      */
     public static void saveSchematic(File schematicFile, ProtectedRegion region, World world)
-            throws IOException, EmptyClipboardException,
-            DataException {
+            throws IOException, EmptyClipboardException, DataException, ChunkNotLoadedException {
 
+        if (world == null) {
+            return;
+        }
         if (!schematicFile.exists()) {
             schematicFile.getParentFile().mkdirs();
         }
@@ -146,6 +159,11 @@ public class SchematicUtils {
         for (int x = 0; x < length; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < width; z++) {
+                    if (!world.isChunkLoaded(region.getMinimumPoint()
+                            .getBlockX() + x >> 4, region.getMinimumPoint()
+                            .getBlockZ() + z >> 4)) {
+                        throw new ChunkNotLoadedException();
+                    }
                     final BaseBlock block = BukkitUtil
                             .getLocalWorld(world).getBlock(
                                     new Vector(region.getMinimumPoint()
@@ -199,9 +217,14 @@ public class SchematicUtils {
      * @param selection the selection
      * @throws IOException
      * @throws DataException
+     * @throws ChunkNotLoadedException
      */
-    public static void saveBlueprintSchematic(Blueprint blueprint, Selection selection) throws IOException, DataException {
+    public static void saveBlueprintSchematic(Blueprint blueprint, Selection selection)
+            throws IOException, DataException, ChunkNotLoadedException {
 
+        if (selection == null || selection.getWorld() == null) {
+            return;
+        }
         if (!blueprint.getBlueprintFile().exists()) {
             blueprint.getBlueprintFile().getParentFile().mkdirs();
         }
@@ -219,6 +242,11 @@ public class SchematicUtils {
         for (int x = 0; x < length; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < width; z++) {
+                    if (!selection.getWorld().isChunkLoaded(selection.getMinimumPoint()
+                            .getBlockX() + x >> 4, selection.getMinimumPoint()
+                            .getBlockZ() + z >> 4)) {
+                        throw new ChunkNotLoadedException();
+                    }
                     final BaseBlock block = BukkitUtil
                             .getLocalWorld(blueprint.getWorld()).getBlock(
                                     new Vector(selection.getMinimumPoint()

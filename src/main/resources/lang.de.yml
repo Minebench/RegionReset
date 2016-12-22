@@ -1,6 +1,7 @@
 texts:
   prefix: '&7[&8RR&7]'
   error:
+    chunkNotLoaded: '&c Der Chunk, in welcher die Region liegt, ist nicht geladen!'
     differentSize: '&c Die Region {0} und der Blueprint {1} haben nicht die gleiche Größe!'
     duplicateBlueprintName: '&c Es existiert bereits ein Blueprint mit dem Namen {0}!'
     noBackupFound: '&c Für die Region {0} wurde kein Backup gefunden!'

@@ -8,10 +8,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
-import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
-import io.github.apfelcreme.RegionReset.Exceptions.NonCuboidRegionException;
-import io.github.apfelcreme.RegionReset.Exceptions.NonCuboidSelectionException;
-import io.github.apfelcreme.RegionReset.Exceptions.UnknownException;
+import io.github.apfelcreme.RegionReset.Exceptions.*;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -186,8 +183,10 @@ public class RegionManager {
      * @param region the region that shall be restored
      * @throws DifferentRegionSizeException
      * @throws UnknownException
+     * @throws ChunkNotLoadedException
      */
-    public void restoreRegion(Player sender, ProtectedRegion region) throws DifferentRegionSizeException, UnknownException {
+    public void restoreRegion(Player sender, ProtectedRegion region)
+            throws DifferentRegionSizeException, UnknownException, ChunkNotLoadedException {
         if (region != null) {
             File restoreSchematic = new File(plugin.getDataFolder() + "/backups/" + sender.getWorld().getName() + "/" + region.getId() + ".schematic");
             if (restoreSchematic.exists()) {
@@ -218,8 +217,10 @@ public class RegionManager {
      * @throws UnknownException
      * @throws DifferentRegionSizeException
      * @throws NonCuboidRegionException
+     * @throws ChunkNotLoadedException
      */
-    public File resetRegion(Player sender, ProtectedRegion region) throws UnknownException, DifferentRegionSizeException, NonCuboidRegionException {
+    public File resetRegion(Player sender, ProtectedRegion region)
+            throws UnknownException, DifferentRegionSizeException, NonCuboidRegionException, ChunkNotLoadedException {
         Blueprint blueprint = RegionManager.getInstance().getBlueprint(region);
         try {
             if (blueprint.getBlueprintFile().exists()) {
@@ -259,8 +260,10 @@ public class RegionManager {
      * @param region the region that is the copy base
      * @throws NonCuboidRegionException
      * @throws UnknownException
+     * @throws ChunkNotLoadedException
      */
-    public void saveRegion(Player sender, ProtectedRegion region) throws NonCuboidRegionException, UnknownException {
+    public void saveRegion(Player sender, ProtectedRegion region)
+            throws NonCuboidRegionException, UnknownException, ChunkNotLoadedException {
         if (region != null) {
             File saveFile = new File(plugin.getDataFolder()
                     + "/backups/" + sender.getWorld().getName() + "/" + region.getId() + ".schematic");
@@ -286,8 +289,10 @@ public class RegionManager {
      * @param blueprintName the name of the blueprint which is being defined
      * @throws NonCuboidSelectionException the selection is not cuboid
      * @throws UnknownException            something else happened
+     * @throws ChunkNotLoadedException
      */
-    public void defineBlueprint(Player sender, Selection selection, String blueprintName) throws NonCuboidSelectionException, UnknownException {
+    public void defineBlueprint(Player sender, Selection selection, String blueprintName)
+            throws NonCuboidSelectionException, UnknownException, ChunkNotLoadedException {
         if (!blueprintName.endsWith(".schematic")) {
             blueprintName += ".schematic";
         }
