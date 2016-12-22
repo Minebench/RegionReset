@@ -272,9 +272,9 @@ public class SchematicUtils {
             @Override
             public void run() {
                 Sign sign = null;
-                for (int x = region.getMinimumPoint().getBlockX(); x < region.getMaximumPoint().getBlockX(); x++) {
-                    for (int y = region.getMinimumPoint().getBlockY(); y < region.getMaximumPoint().getBlockY(); y++) {
-                        for (int z = region.getMinimumPoint().getBlockZ(); z < region.getMaximumPoint().getBlockZ(); z++) {
+                for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
+                    for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
+                        for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
                             if (world.getBlockAt(x, y, z).getType() == Material.SIGN_POST
                                     || world.getBlockAt(x, y, z).getType() == Material.WALL_SIGN) {
                                 Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();

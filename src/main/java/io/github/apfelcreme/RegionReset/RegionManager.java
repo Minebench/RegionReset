@@ -250,8 +250,6 @@ public class RegionManager {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
-        } catch (DifferentRegionSizeException e) {
-            e.printStackTrace();
         }
         return null;
     }
