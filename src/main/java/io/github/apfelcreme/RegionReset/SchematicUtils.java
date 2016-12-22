@@ -10,12 +10,14 @@ import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
-import org.bukkit.World;
+import me.ChrisvA.MbRegionConomy.MbRegionConomy;
 import org.bukkit.*;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -76,48 +78,43 @@ public class SchematicUtils {
                 throw new DifferentRegionSizeException(region.getId(), schematicFile.getName());
             }
 
+            for (int x = 0; x < length; ++x) {
+                for (int y = 0; y < height; ++y) {
+                    for (int z = 0; z < width; ++z) {
 
-            RegionReset.getInstance().getServer().getScheduler().runTaskAsynchronously(RegionReset.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    for (int x = 0; x < length; ++x) {
-                        for (int y = 0; y < height; ++y) {
-                            for (int z = 0; z < width; ++z) {
-                                final BaseBlock block = clipboard.getBlock(new Vector(
-                                        x, y, z));
-                                if (block == null) {
-                                    continue;
-                                }
-                                if (noAir && block.isAir()) {
-                                    continue;
                         if (!world.isChunkLoaded(region.getMinimumPoint()
                                 .getBlockX() + x >> 4, region.getMinimumPoint()
                                 .getBlockZ() + z >> 4)) {
                             throw new ChunkNotLoadedException();
                         }
-
-                                }
-
-                                final int finalX = x;
-                                final int finalY = y;
-                                final int finalZ = z;
-
-                                RegionReset.getInstance().getServer().getScheduler().runTask(RegionReset.getInstance(), new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            editSession.setBlock(new Vector(finalX, finalY, finalZ).add(region
-                                                    .getMinimumPoint()), block);
-                                        } catch (MaxChangedBlocksException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                });
-                            }
+                        final BaseBlock block = clipboard.getBlock(new Vector(
+                                x, y, z));
+                        if (block == null) {
+                            continue;
                         }
+                        if (noAir && block.isAir()) {
+                            continue;
+
+                        }
+
+                        final int finalX = x;
+                        final int finalY = y;
+                        final int finalZ = z;
+
+                        RegionReset.getInstance().getServer().getScheduler().runTask(RegionReset.getInstance(), new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    editSession.setBlock(new Vector(finalX, finalY, finalZ).add(region
+                                            .getMinimumPoint()), block);
+                                } catch (MaxChangedBlocksException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
                 }
-            });
+            }
             editSession.flushQueue();
         } catch (DataException | IOException e) {
             e.printStackTrace();
@@ -259,5 +256,57 @@ public class SchematicUtils {
             }
         }
         SchematicFormat.MCEDIT.save(clipboard, blueprint.getBlueprintFile());
+    }
+
+    /**
+     * Looks for signs with [Verkauf] written on the recently reset region.
+     * If there is one, things will be written on it.
+     *
+     * @param sender a player
+     * @param region the region that shall be inspected
+     * @param world  the world the region is in
+     */
+    public static void buildRegionConomySign(final Player sender, final ProtectedRegion region, final World world) {
+
+        RegionReset.getInstance().getServer().getScheduler().runTask(RegionReset.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                Sign sign = null;
+                for (int x = region.getMinimumPoint().getBlockX(); x < region.getMaximumPoint().getBlockX(); x++) {
+                    for (int y = region.getMinimumPoint().getBlockY(); y < region.getMaximumPoint().getBlockY(); y++) {
+                        for (int z = region.getMinimumPoint().getBlockZ(); z < region.getMaximumPoint().getBlockZ(); z++) {
+                            if (world.getBlockAt(x, y, z).getType() == Material.SIGN_POST
+                                    || world.getBlockAt(x, y, z).getType() == Material.WALL_SIGN) {
+                                Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
+                                String signSellLine = RegionReset.getInstance().getRegionConomy().getConf().getSignSell();
+                                if (tempSign.getLines()[0].equals(signSellLine)) {
+                                    sign = tempSign;
+                                }
+
+                            }
+                        }
+                    }
+                }
+                if (sign != null) {
+                    MbRegionConomy regionConomy = RegionReset.getInstance().getRegionConomy();
+                    if (regionConomy.getRegionDatabase().regionExists(world.getName(),
+                            region.getId())) {
+                        regionConomy.getRegions().sale(sender, region.getId(),
+                                regionConomy.getRegionDatabase().getPrice(sender.getWorld().getName(), region.getId()));
+                        sign.setLine(0, regionConomy.getConf().getSignSell());
+                        sign.setLine(1, region.getId());
+                        sign.setLine(2, Double.toString(regionConomy.getRegionDatabase().getPrice(world.getName(), region.getId())));
+                        sign.setLine(3, regionConomy.getRegionDatabase().getPermission(world.getName(), region.getId()));
+                        sign.update();
+                    } else {
+                        sign.setLine(0, "");
+                        sign.setLine(1, "");
+                        sign.setLine(2, "");
+                        sign.setLine(3, "");
+                        sign.update();
+                    }
+                }
+            }
+        });
     }
 }

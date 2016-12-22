@@ -3,7 +3,7 @@ package io.github.apfelcreme.RegionReset;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
-import net.zaiyers.UUIDDB.bukkit.UUIDDB;
+import me.ChrisvA.MbRegionConomy.MbRegionConomy;
 import net.zaiyers.UUIDDB.core.UUIDDBPlugin;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -68,6 +68,11 @@ public class RegionReset extends JavaPlugin {
     private WorldGuardPlugin worldGuard = null;
 
     /**
+     *  the mbregionconomy plugin instance
+     */
+    private MbRegionConomy regionConomy = null;
+
+    /**
      * onEnable
      */
     public void onEnable() {
@@ -101,6 +106,11 @@ public class RegionReset extends JavaPlugin {
             getLogger().severe("Plugin WorldGuard wasn't found!");
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+        regionConomy = (MbRegionConomy) getServer().getPluginManager()
+                .getPlugin("MbRegionConomy");
+        if (regionConomy == null) {
+            getLogger().info("Plugin MbRegionConomy wasn't found! Never mind.");
         }
 
         // initialize the rightclick listener
@@ -155,6 +165,14 @@ public class RegionReset extends JavaPlugin {
      */
     public WorldGuardPlugin getWorldGuard() {
         return worldGuard;
+    }
+
+    /**
+     * returns the mbregionconomy plugin instance
+     * @return the mbregionconomy plugin instance
+     */
+    public MbRegionConomy getRegionConomy() {
+        return regionConomy;
     }
 
 
