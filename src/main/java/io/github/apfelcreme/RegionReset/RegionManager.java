@@ -230,13 +230,15 @@ public class RegionManager {
                                 + "/backups/" + sender.getWorld().getName() + "/" + region.getId() + ".schematic");
                         SchematicUtils.saveSchematic(backupFile, region, sender.getWorld());
                         SchematicUtils.pasteBlueprint(blueprint.getBlueprintFile(), false, region, sender.getWorld());
-                        if (RegionReset.getInstance().getRegionConomy() != null) {
+                        if (plugin.getPlotSigns() != null) {
+                            SchematicUtils.buildPlotSignsSign(sender, region, sender.getWorld());
+                        }
+                        if (plugin.getRegionConomy() != null) {
                             SchematicUtils.buildRegionConomySign(sender, region, sender.getWorld());
                         }
                         region.getOwners().removeAll();
                         region.getMembers().removeAll();
-                        RegionReset.getInstance().getWorldGuard()
-                                .getRegionManager(sender.getWorld()).save();
+                        plugin.getWorldGuard().getRegionManager(sender.getWorld()).save();
                         plugin.getLogger().info("Region '" + region.getId() + "' in World '" + sender.getWorld().getName()
                                 + "' has been reset by " + sender.getName());
                         return backupFile;

@@ -2,6 +2,7 @@ package io.github.apfelcreme.RegionReset;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import de.minebench.plotsigns.PlotSigns;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
 import me.ChrisvA.MbRegionConomy.MbRegionConomy;
 import net.zaiyers.UUIDDB.core.UUIDDBPlugin;
@@ -68,6 +69,11 @@ public class RegionReset extends JavaPlugin {
     private WorldGuardPlugin worldGuard = null;
 
     /**
+     * PlotSigns plugin instance
+     */
+    private PlotSigns plotSigns = null;
+
+    /**
      *  the mbregionconomy plugin instance
      */
     private MbRegionConomy regionConomy = null;
@@ -106,6 +112,10 @@ public class RegionReset extends JavaPlugin {
             getLogger().severe("Plugin WorldGuard wasn't found!");
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+        plotSigns = (PlotSigns) getServer().getPluginManager().getPlugin("PlotSigns");
+        if (plotSigns == null) {
+            getLogger().info("Plugin PlotSigns wasn't found! Never mind.");
         }
         regionConomy = (MbRegionConomy) getServer().getPluginManager()
                 .getPlugin("MbRegionConomy");
@@ -165,6 +175,14 @@ public class RegionReset extends JavaPlugin {
      */
     public WorldGuardPlugin getWorldGuard() {
         return worldGuard;
+    }
+
+    /**
+     * returns the PlotSigns plugin instance
+     * @return the PlotSigns plugin instance
+     */
+    public PlotSigns getPlotSigns() {
+        return plotSigns;
     }
 
     /**

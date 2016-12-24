@@ -7,7 +7,9 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import de.minebench.plotsigns.PlotSigns;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
 import me.ChrisvA.MbRegionConomy.MbRegionConomy;
@@ -23,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -259,6 +262,62 @@ public class SchematicUtils {
     }
 
     /**
+     * Looks for signs with the sell line from PlotSigns written on the recently reset region.
+     * If there is one, things will be written on it.
+     *
+     * @param sender a player
+     * @param region the region that shall be inspected
+     * @param world  the world the region is in
+     */
+    public static void buildPlotSignsSign(final Player sender, final ProtectedRegion region, final World world) {
+        if (RegionReset.getInstance().getPlotSigns() == null) {
+            return;
+        }
+
+        RegionReset.getInstance().getServer().getScheduler().runTask(RegionReset.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                List<Sign> signs = new ArrayList<>();
+                String signSellLine = RegionReset.getInstance().getPlotSigns().getSellLine();
+                for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
+                    for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
+                        for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
+                            if (world.getBlockAt(x, y, z).getType() == Material.SIGN_POST
+                                    || world.getBlockAt(x, y, z).getType() == Material.WALL_SIGN) {
+                                Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
+                                if (tempSign.getLines()[0].equals(signSellLine)) {
+                                    signs.add(tempSign);
+                                }
+
+                            }
+                        }
+                    }
+                }
+                if (signs.size() > 0) {
+                    if (region.getFlag(DefaultFlag.BUYABLE) != null && region.getFlag(DefaultFlag.PRICE) != null) {
+                        PlotSigns plotSigns = RegionReset.getInstance().getPlotSigns();
+                        region.setFlag(DefaultFlag.BUYABLE, true);
+                        String[] lines = plotSigns.getSignLines(region);
+                        for (Sign sign : signs) {
+                            for (int i = 0; i < lines.length; i++) {
+                                sign.setLine(i, lines[i]);
+                            }
+                            sign.update();
+                        }
+                    } else {
+                        for (Sign sign : signs) {
+                            for (int i = 0; i < 4; i++) {
+                                sign.setLine(i, "");
+                            }
+                            sign.update();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * Looks for signs with [Verkauf] written on the recently reset region.
      * If there is one, things will be written on it.
      *
@@ -267,11 +326,14 @@ public class SchematicUtils {
      * @param world  the world the region is in
      */
     public static void buildRegionConomySign(final Player sender, final ProtectedRegion region, final World world) {
+        if (RegionReset.getInstance().getRegionConomy() == null) {
+            return;
+        }
 
         RegionReset.getInstance().getServer().getScheduler().runTask(RegionReset.getInstance(), new Runnable() {
             @Override
             public void run() {
-                Sign sign = null;
+                List<Sign> signs = new ArrayList<>();
                 for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
                     for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
                         for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
@@ -280,30 +342,40 @@ public class SchematicUtils {
                                 Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
                                 String signSellLine = RegionReset.getInstance().getRegionConomy().getConf().getSignSell();
                                 if (tempSign.getLines()[0].equals(signSellLine)) {
-                                    sign = tempSign;
+                                    signs.add(tempSign);
                                 }
 
                             }
                         }
                     }
                 }
-                if (sign != null) {
+                if (signs.size() > 0) {
                     MbRegionConomy regionConomy = RegionReset.getInstance().getRegionConomy();
                     if (regionConomy.getRegionDatabase().regionExists(world.getName(),
                             region.getId())) {
                         regionConomy.getRegions().sale(sender, region.getId(),
                                 regionConomy.getRegionDatabase().getPrice(sender.getWorld().getName(), region.getId()));
-                        sign.setLine(0, regionConomy.getConf().getSignSell());
-                        sign.setLine(1, region.getId());
-                        sign.setLine(2, Double.toString(regionConomy.getRegionDatabase().getPrice(world.getName(), region.getId())));
-                        sign.setLine(3, regionConomy.getRegionDatabase().getPermission(world.getName(), region.getId()));
-                        sign.update();
+                        regionConomy.getRegions().sale(sender, region.getId(),
+                                regionConomy.getRegionDatabase().getPrice(sender.getWorld().getName(), region.getId()));
+                        String[] lines = {
+                                regionConomy.getConf().getSignSell(),
+                                region.getId(),
+                                Double.toString(regionConomy.getRegionDatabase().getPrice(world.getName(), region.getId())),
+                                regionConomy.getRegionDatabase().getPermission(world.getName(), region.getId())
+                        };
+                        for (Sign sign : signs) {
+                            for (int i = 0; i < lines.length; i++) {
+                                sign.setLine(i, lines[i]);
+                            }
+                            sign.update();
+                        }
                     } else {
-                        sign.setLine(0, "");
-                        sign.setLine(1, "");
-                        sign.setLine(2, "");
-                        sign.setLine(3, "");
-                        sign.update();
+                        for (Sign sign : signs) {
+                            for (int i = 0; i < 4; i++) {
+                                sign.setLine(i, "");
+                            }
+                            sign.update();
+                        }
                     }
                 }
             }
