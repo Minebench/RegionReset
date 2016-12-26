@@ -87,8 +87,10 @@ public class RegionReset extends JavaPlugin {
 
         // initialize the uuid cache
         uuidCache = new HashMap<>();
-        uuidDb = (UUIDDBPlugin) getServer().getPluginManager()
-                .getPlugin("UUIDDB");
+        if (getServer().getPluginManager().isPluginEnabled("UUIDDB")) {
+            uuidDb = (UUIDDBPlugin) getServer().getPluginManager()
+                    .getPlugin("UUIDDB");
+        }
 
         // create the data folder
         if (!getDataFolder().exists()) {
@@ -113,13 +115,13 @@ public class RegionReset extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        plotSigns = (PlotSigns) getServer().getPluginManager().getPlugin("PlotSigns");
-        if (plotSigns == null) {
+        if (getServer().getPluginManager().isPluginEnabled("PlotSigns")) {
+            plotSigns = (PlotSigns) getServer().getPluginManager().getPlugin("PlotSigns");
             getLogger().info("Plugin PlotSigns wasn't found! Never mind.");
         }
-        regionConomy = (MbRegionConomy) getServer().getPluginManager()
-                .getPlugin("MbRegionConomy");
-        if (regionConomy == null) {
+        if (getServer().getPluginManager().isPluginEnabled("MbRegionConomy")) {
+            regionConomy = (MbRegionConomy) getServer().getPluginManager()
+                    .getPlugin("MbRegionConomy");
             getLogger().info("Plugin MbRegionConomy wasn't found! Never mind.");
         }
 
