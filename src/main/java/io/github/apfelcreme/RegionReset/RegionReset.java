@@ -4,7 +4,6 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import de.minebench.plotsigns.PlotSigns;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
-import me.ChrisvA.MbRegionConomy.MbRegionConomy;
 import net.zaiyers.UUIDDB.core.UUIDDBPlugin;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -74,11 +73,6 @@ public class RegionReset extends JavaPlugin {
     private PlotSigns plotSigns = null;
 
     /**
-     *  the mbregionconomy plugin instance
-     */
-    private MbRegionConomy regionConomy = null;
-
-    /**
      * onEnable
      */
     public void onEnable() {
@@ -118,11 +112,6 @@ public class RegionReset extends JavaPlugin {
         if (getServer().getPluginManager().isPluginEnabled("PlotSigns")) {
             plotSigns = (PlotSigns) getServer().getPluginManager().getPlugin("PlotSigns");
             getLogger().info("Plugin PlotSigns wasn't found! Never mind.");
-        }
-        if (getServer().getPluginManager().isPluginEnabled("MbRegionConomy")) {
-            regionConomy = (MbRegionConomy) getServer().getPluginManager()
-                    .getPlugin("MbRegionConomy");
-            getLogger().info("Plugin MbRegionConomy wasn't found! Never mind.");
         }
 
         // initialize the rightclick listener
@@ -185,14 +174,6 @@ public class RegionReset extends JavaPlugin {
      */
     public PlotSigns getPlotSigns() {
         return plotSigns;
-    }
-
-    /**
-     * returns the mbregionconomy plugin instance
-     * @return the mbregionconomy plugin instance
-     */
-    public MbRegionConomy getRegionConomy() {
-        return regionConomy;
     }
 
 

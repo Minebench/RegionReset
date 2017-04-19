@@ -4,7 +4,6 @@ import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
@@ -232,9 +231,6 @@ public class RegionManager {
                         SchematicUtils.pasteBlueprint(blueprint.getBlueprintFile(), false, region, sender.getWorld());
                         if (plugin.getPlotSigns() != null) {
                             SchematicUtils.buildPlotSignsSign(sender, region, sender.getWorld());
-                        }
-                        if (plugin.getRegionConomy() != null) {
-                            SchematicUtils.buildRegionConomySign(sender, region, sender.getWorld());
                         }
                         region.getOwners().removeAll();
                         region.getMembers().removeAll();

@@ -2,7 +2,7 @@ name: RegionReset
 version: '${minecraft.plugin.version}'
 main: io.github.apfelcreme.RegionReset.RegionReset
 depend: [WorldGuard, WorldEdit]
-softdepend: [UUIDDB,MbRegionConomy,PlotSigns]
+softdepend: [UUIDDB,PlotSigns]
 
 commands:
    rr:
