@@ -1,5 +1,6 @@
 package io.github.apfelcreme.RegionReset;
 
+import com.griefcraft.lwc.LWC;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import de.minebench.plotsigns.PlotSigns;
@@ -73,6 +74,11 @@ public class RegionReset extends JavaPlugin {
     private PlotSigns plotSigns = null;
 
     /**
+     * LWC plugin instance
+     */
+    private LWC lwc;
+
+    /**
      * onEnable
      */
     public void onEnable() {
@@ -111,7 +117,11 @@ public class RegionReset extends JavaPlugin {
         }
         if (getServer().getPluginManager().isPluginEnabled("PlotSigns")) {
             plotSigns = (PlotSigns) getServer().getPluginManager().getPlugin("PlotSigns");
-            getLogger().info("Plugin PlotSigns wasn't found! Never mind.");
+            getLogger().info("Plugin PlotSigns found!");
+        }
+        if (getServer().getPluginManager().isPluginEnabled("LWC")) {
+            lwc = LWC.getInstance();
+            getLogger().info("Plugin LWC found!");
         }
 
         // initialize the rightclick listener
@@ -174,6 +184,14 @@ public class RegionReset extends JavaPlugin {
      */
     public PlotSigns getPlotSigns() {
         return plotSigns;
+    }
+
+    /**
+     * returns the LWC  plugin instance
+     * @return the LWC plugin instance
+     */
+    public LWC getLWC() {
+        return lwc;
     }
 
 

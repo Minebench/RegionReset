@@ -232,6 +232,7 @@ public class RegionManager {
                         if (plugin.getPlotSigns() != null) {
                             SchematicUtils.buildPlotSignsSign(sender, region, sender.getWorld());
                         }
+                        SchematicUtils.removeProtections(sender, region, sender.getWorld());
                         region.getOwners().removeAll();
                         region.getMembers().removeAll();
                         plugin.getWorldGuard().getRegionManager(sender.getWorld()).save();

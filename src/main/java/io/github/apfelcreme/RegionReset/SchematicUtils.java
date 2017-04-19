@@ -1,5 +1,6 @@
 package io.github.apfelcreme.RegionReset;
 
+import com.griefcraft.lwc.LWC;
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -16,6 +17,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import de.minebench.plotsigns.PlotSigns;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
@@ -316,5 +318,21 @@ public class SchematicUtils {
                 }
             }
         });
+    }
+
+    public static void removeProtections(Player sender, ProtectedRegion region, World world) {
+        if (RegionReset.getInstance().getLWC() != null) {
+            Bukkit.getScheduler().runTaskAsynchronously(RegionReset.getInstance(), () -> {
+                LWC.getInstance().fastRemoveProtections(sender,
+                        "world=`" + world.getName() + "`"
+                                + " AND x >= " + region.getMinimumPoint().getBlockX()
+                                + " AND y >= " + region.getMinimumPoint().getBlockY()
+                                + " AND z >= " + region.getMinimumPoint().getBlockZ()
+                                + " AND x <= " + region.getMaximumPoint().getBlockX()
+                                + " AND y <= " + region.getMaximumPoint().getBlockY()
+                                + " AND z <= " + region.getMaximumPoint().getBlockZ()
+                        , false);
+            });
+        }
     }
 }
