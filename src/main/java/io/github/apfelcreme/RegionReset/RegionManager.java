@@ -1,6 +1,7 @@
 package io.github.apfelcreme.RegionReset;
 
 import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
@@ -201,8 +202,12 @@ public class RegionManager {
                         region.getMembers().addPlayer(UUID.fromString(memberUUID));
                     }
                 }
-                SchematicUtils.pasteBlueprint(restoreSchematic, false,
-                        region, sender.getWorld());
+                try {
+                    SchematicUtils.pasteBlueprint(restoreSchematic, false,
+                            region, sender.getWorld());
+                } catch (MaxChangedBlocksException e) { // MaxChangedBlocksException shouldn't be happening as the EditSession can paste Integer.MAX_VALUE
+                    throw new UnknownException(e);
+                }
             }
         }
     }
@@ -244,7 +249,8 @@ public class RegionManager {
                     }
                 }
             }
-        } catch (DataException | EmptyClipboardException | StorageException e) {
+        } catch (DataException | EmptyClipboardException | StorageException | MaxChangedBlocksException e) {
+            // MaxChangedBlocksException shouldn't be happening as the EditSession can paste Integer.MAX_VALUE
             throw new UnknownException(e);
         } catch (IOException e) {
             e.printStackTrace();
