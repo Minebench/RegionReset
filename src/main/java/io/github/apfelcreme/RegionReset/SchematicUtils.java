@@ -260,7 +260,7 @@ public class SchematicUtils {
         if (RegionReset.getInstance().getLWC() != null) {
             Bukkit.getScheduler().runTaskAsynchronously(RegionReset.getInstance(), () -> {
                 LWC.getInstance().fastRemoveProtections(sender,
-                        "world=`" + world.getName() + "`"
+                        "world = '" + world.getName() + "'"
                                 + " AND x >= " + region.getMinimumPoint().getBlockX()
                                 + " AND y >= " + region.getMinimumPoint().getBlockY()
                                 + " AND z >= " + region.getMinimumPoint().getBlockZ()
