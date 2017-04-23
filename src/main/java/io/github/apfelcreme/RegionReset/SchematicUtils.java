@@ -78,11 +78,9 @@ public class SchematicUtils {
             }
 
             // Check if chunks are loaded
-            for (int x = 0; x < length; x++) {
-                for (int z = 0; z < width; z++) {
-                    if (!world.isChunkLoaded(
-                            region.getMinimumPoint().getBlockX() + x >> 4,
-                            region.getMinimumPoint().getBlockZ() + z >> 4)) {
+            for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
+                for (int z = region.getMinimumPoint().getBlockZ(); z < region.getMaximumPoint().getBlockZ(); z++) {
+                    if (!world.isChunkLoaded(x >> 4, z >> 4)) {
                         throw new ChunkNotLoadedException();
                     }
                 }
@@ -120,9 +118,7 @@ public class SchematicUtils {
         // Check if chunks are loaded
         for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
             for (int z = region.getMinimumPoint().getBlockZ(); z < region.getMaximumPoint().getBlockZ(); z++) {
-                if (!world.isChunkLoaded(region.getMinimumPoint()
-                        .getBlockX() + x >> 4, region.getMinimumPoint()
-                        .getBlockZ() + z >> 4)) {
+                if (!world.isChunkLoaded(x >> 4, z >> 4)) {
                     throw new ChunkNotLoadedException();
                 }
             }
@@ -192,9 +188,7 @@ public class SchematicUtils {
         // Check if chunks are loaded
         for (int x = selection.getMinimumPoint().getBlockX(); x <= selection.getMaximumPoint().getBlockX(); x++) {
             for (int z = selection.getMinimumPoint().getBlockZ(); z < selection.getMaximumPoint().getBlockZ(); z++) {
-                if (!selection.getWorld().isChunkLoaded(selection.getMinimumPoint()
-                        .getBlockX() + x >> 4, selection.getMinimumPoint()
-                        .getBlockZ() + z >> 4)) {
+                if (!selection.getWorld().isChunkLoaded(x >> 4, z >> 4)) {
                     throw new ChunkNotLoadedException();
                 }
             }
