@@ -5,6 +5,7 @@ import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.selections.Selection;
@@ -128,7 +129,8 @@ public class SchematicUtils {
         CuboidClipboard clipboard = new CuboidClipboard(
                 region.getMaximumPoint()
                         .subtract(region.getMinimumPoint())
-                        .add(1, 1, 1)
+                        .add(1, 1, 1),
+                region.getMinimumPoint()
         );
         clipboard.copy(editSession);
 
@@ -198,7 +200,8 @@ public class SchematicUtils {
         CuboidClipboard clipboard = new CuboidClipboard(
                 selection.getNativeMaximumPoint()
                         .subtract(selection.getNativeMinimumPoint())
-                        .add(1, 1, 1)
+                        .add(1, 1, 1),
+                selection.getNativeMinimumPoint()
         );
         clipboard.copy(editSession);
 
