@@ -238,24 +238,27 @@ public class SchematicUtils {
             }
         }
         if (signs.size() > 0) {
-            if (region.getFlag(DefaultFlag.BUYABLE) != null && region.getFlag(DefaultFlag.PRICE) != null) {
-                PlotSigns plotSigns = RegionReset.getInstance().getPlotSigns();
-                region.setFlag(DefaultFlag.BUYABLE, true);
-                String[] lines = plotSigns.getSignLines(region);
-                for (Sign sign : signs) {
-                    for (int i = 0; i < lines.length; i++) {
-                        sign.setLine(i, lines[i]);
+            Bukkit.getScheduler().runTask(RegionReset.getInstance(), () -> {
+                if (region.getFlag(DefaultFlag.BUYABLE) != null && region.getFlag(DefaultFlag.PRICE) != null) {
+                    PlotSigns plotSigns = RegionReset.getInstance().getPlotSigns();
+                    region.setFlag(DefaultFlag.BUYABLE, true);
+                    String[] lines = plotSigns.getSignLines(region);
+                    for (Sign sign : signs) {
+                        for (int i = 0; i < lines.length; i++) {
+                            sign.setLine(i, lines[i]);
+                        }
+                        sign.update();
                     }
-                    sign.update();
-                }
-            } else {
-                for (Sign sign : signs) {
-                    for (int i = 0; i < 4; i++) {
-                        sign.setLine(i, "");
+                } else {
+                    for (Sign sign : signs) {
+                        for (int i = 0; i < 4; i++) {
+                            sign.setLine(i, "");
+                        }
+                        sign.update();
                     }
-                    sign.update();
                 }
-            }
+
+            });
         }
     }
 
