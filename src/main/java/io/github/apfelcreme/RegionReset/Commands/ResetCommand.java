@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.logging.Level;
 
 /**
  * Plugin zum Reset von WorldGuard-Regionen mit einer Standard-Region
@@ -60,7 +61,7 @@ public class ResetCommand implements SubCommand {
                         } catch (UnknownException e) {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")
                                     .replace("{0}", e.getException().getClass().getName()));
-                            e.printStackTrace();
+                            RegionReset.getInstance().getLogger().log(Level.SEVERE, e.getException().getMessage(), e.getException());
                         } catch (DifferentRegionSizeException e) {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.differentSize")
                                     .replace("{0}", e.getRegionName())
