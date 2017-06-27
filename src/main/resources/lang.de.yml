@@ -25,7 +25,7 @@ texts:
     check:
       header: '&a Alle Regionen des Blueprints &2{0}&a, deren Eigner seit &2{1}&a Tagen offline sind: &2(&a{2]&2/&a{3}&2)'
       element: '&8 - &2{0}: &c&o/rr reset {1}'
-      footer: '&a Für andere Seiten: &2/rr list <Blueprint> <#>'
+      footer: '&a Für andere Seiten: &2/rr check <Blueprint> <#>'
     checkDetail:
       header: '&a Alle Regionen des Blueprints &2{0}&a, deren Eigner seit &2{1}&a Tagen offline sind: &2(&a{2}&2/&a{3}&2)'
       member: '&8   - &7{0}: &8{1}'
@@ -33,7 +33,7 @@ texts:
       region1: '&8 - &2{0}: &aBereit zum Reset'
       region2: '&8 - &2{0}: &cNicht bereit zum Reset'
       region3: '&8 - &2{0}: &7Keine Owner/Member'
-      footer: '&a Für andere Seiten: &2/rr list <Blueprint> <#>'
+      footer: '&a Für andere Seiten: &2/rr checkdetail <Blueprint> <#>'
     define:
       defined: '&a Du hast den Blueprint &2{0}&a erfolgreich definiert'
     delete:
