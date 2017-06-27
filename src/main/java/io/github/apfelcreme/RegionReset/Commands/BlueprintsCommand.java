@@ -39,23 +39,22 @@ public class BlueprintsCommand implements SubCommand {
      * @param strings       the command args
      */
     public void execute(CommandSender commandSender, String[] strings) {
-        Player sender = (Player) commandSender;
-        if (sender.hasPermission("RegionReset.list")) {
-            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.blueprints.header"));
+        if (commandSender.hasPermission("RegionReset.list")) {
+            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.blueprints.header"));
             for (World world : RegionReset.getInstance().getServer().getWorlds()) {
                 List<Blueprint> worldBlueprints = RegionManager.getInstance().getBlueprints(world);
                 if (!worldBlueprints.isEmpty()) {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.blueprints.worldHeader")
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.blueprints.worldHeader")
                             .replace("{0}", world.getName()));
                     for (Blueprint blueprint : worldBlueprints) {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("info.blueprints.element")
+                        RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.blueprints.element")
                                 .replace("{0}", blueprint.getName())
                                 .replace("{1}", Integer.toString(blueprint.getRegions().size())));
                     }
                 }
             }
         } else {
-            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noPermission"));
+            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.noPermission"));
         }
     }
 }

@@ -38,9 +38,8 @@ public class CheckCommand implements SubCommand {
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
 
-        Player sender = (Player) commandSender;
         final long MSPERDAY = 86400000;
-        if (sender.hasPermission("RegionReset.check")) {
+        if (commandSender.hasPermission("RegionReset.check")) {
             if (strings.length > 1) {
                 String blueprintName = strings[1];
                 Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
@@ -55,7 +54,7 @@ public class CheckCommand implements SubCommand {
                     if (page >= maxPages - 1) {
                         page = maxPages - 1;
                     }
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.checkDetail.header")
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.header")
                             .replace("{0}", blueprint.getName())
                             .replace("{1}", Integer.toString(RegionReset.getInstance().getConfig().getInt("resetLimit")))
                             .replace("{2}", Integer.toString(page + 1))
@@ -78,23 +77,23 @@ public class CheckCommand implements SubCommand {
 
                             //print the results
                             if (!atLeastOneActivePlayer) {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.check.element")
+                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.check.element")
                                         .replace("{0}", blueprint.getRegions().get(i).getId())
                                         .replace("{1}", blueprint.getRegions().get(i).getId()));
                             }
                         }
                     }
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.check.footer"));
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.check.footer"));
                 } else {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprint")
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.unknownBlueprint")
                             .replace("{0}", blueprintName));
                 }
             } else {
-                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")
+                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.wrongUsage")
                         .replace("{0}", "/rr check <Blueprint>"));
             }
         } else {
-            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noPermission"));
+            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.noPermission"));
         }
     }
 }

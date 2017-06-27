@@ -35,15 +35,13 @@ public class ReloadCommand implements SubCommand {
      * @param strings       the command args
      */
     public void execute(CommandSender commandSender, String[] strings) {
-
-        Player sender = (Player) commandSender;
-        if (sender.hasPermission("RegionReset.reload")) {
+        if (commandSender.hasPermission("RegionReset.reload")) {
             RegionReset.getInstance().reloadConfig();
             RegionManager.getInstance().reloadBlueprintConfig();
             RegionResetConfig.load();
-            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.reload.reloaded"));
+            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.reload.reloaded"));
         } else {
-            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noPermission"));
+            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.noPermission"));
         }
     }
 }

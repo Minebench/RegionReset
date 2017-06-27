@@ -38,9 +38,8 @@ public class CheckDetailCommand implements SubCommand {
      * @param strings       the command args
      */
     public void execute(CommandSender commandSender, String[] strings) {
-        Player sender = (Player) commandSender;
         final long MSPERDAY = 86400000;
-        if (sender.hasPermission("RegionReset.checkDetail")) {
+        if (commandSender.hasPermission("RegionReset.checkDetail")) {
             if (strings.length > 1) {
                 String blueprintName = strings[1];
                 Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
@@ -55,7 +54,7 @@ public class CheckDetailCommand implements SubCommand {
                     if (page >= maxPages - 1) {
                         page = maxPages - 1;
                     }
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.checkDetail.header")
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.header")
                             .replace("{0}", blueprint.getName())
                             .replace("{1}", Integer.toString(RegionReset.getInstance().getConfig().getInt("resetLimit")))
                             .replace("{2}", Integer.toString(page + 1))
@@ -80,35 +79,35 @@ public class CheckDetailCommand implements SubCommand {
 
                             //print the results
                             if (members.size() == 0) {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.checkDetail.region3")
+                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.region3")
                                         .replace("{0}", blueprint.getRegions().get(i).getId()));
                             } else if (!atLeastOneActivePlayer) {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.checkDetail.region1")
+                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.region1")
                                         .replace("{0}", blueprint.getRegions().get(i).getId()));
                             } else {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.checkDetail.region2")
+                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.region2")
                                         .replace("{0}", blueprint.getRegions().get(i).getId()));
                             }
                             for (Map.Entry<UUID, Long> entry : offlineTimes.entrySet()) {
                                 String name = RegionReset.getInstance().getNameByUUID(entry.getKey());
                                 String offlineTime = RegionReset.formatTimeDifference(entry.getValue());
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.checkDetail.member")
+                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.member")
                                         .replace("{0}", name)
                                         .replace("{1}", offlineTime));
                             }
                         }
                     }
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.checkDetail.footer"));
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.footer"));
                 } else {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprint")
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.unknownBlueprint")
                             .replace("{0}", blueprintName));
                 }
             } else {
-                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")
+                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.wrongUsage")
                         .replace("{0}", "/rr check <Blueprint>"));
             }
         } else {
-            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noPermission"));
+            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.noPermission"));
         }
     }
 }

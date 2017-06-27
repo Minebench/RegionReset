@@ -36,8 +36,7 @@ public class ListCommand implements SubCommand {
      * @param strings       the command args
      */
     public void execute(CommandSender commandSender, String[] strings) {
-        Player sender = (Player) commandSender;
-        if (sender.hasPermission("RegionReset.list")) {
+        if (commandSender.hasPermission("RegionReset.list")) {
             if (strings.length > 1) {
                 String blueprintName = strings[1];
                 Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
@@ -53,27 +52,27 @@ public class ListCommand implements SubCommand {
                     if (page >= maxPages - 1) {
                         page = maxPages - 1;
                     }
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.list.header")
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.list.header")
                             .replace("{0}", blueprintName)
                             .replace("{1}", Integer.toString(page + 1))
                             .replace("{2}", maxPages.toString()));
                     for (int i = page * pageSize; i < (page * pageSize) + pageSize; i++) {
                         if (i < blueprint.getRegions().size() && blueprint.getRegions().size() > 0) {
-                            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.list.element")
+                            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.list.element")
                                     .replace("{0}", blueprint.getRegions().get(i).getId()));
                         }
                     }
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.list.footer"));
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.list.footer"));
                 } else {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprint")
+                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.unknownBlueprint")
                             .replace("{0}", blueprintName));
                 }
             } else {
-                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")
+                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.wrongUsage")
                         .replace("{0}", "/rr list <Blueprint>"));
             }
         } else {
-            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noPermission"));
+            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.noPermission"));
         }
     }
 }

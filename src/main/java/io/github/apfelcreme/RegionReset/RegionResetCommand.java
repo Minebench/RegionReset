@@ -39,73 +39,69 @@ public class RegionResetCommand implements CommandExecutor {
      * @param args    the command line arguments
      * @return false
      */
-    public boolean onCommand(final CommandSender sender, Command cmd,
-                             String label, final String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            SubCommand subCommand = null;
-            if (args.length > 0) {
-                Operation operation = Operation.getOperation(args[0]);
-                if (operation != null) {
-                    switch (operation) {
-                        case ADD:
-                            subCommand = new AddCommand();
-                            break;
-                        case BLUEPRINTS:
-                            subCommand = new BlueprintsCommand();
-                            break;
-                        case CHECK:
-                            subCommand = new CheckCommand();
-                            break;
-                        case CHECKDETAIL:
-                            subCommand = new CheckDetailCommand();
-                            break;
-                        case DEFINE:
-                            subCommand = new DefineCommand();
-                            break;
-                        case DELETE:
-                            subCommand = new DeleteCommand();
-                            break;
-                        case INFO:
-                            subCommand = new InfoCommand();
-                            break;
-                        case LIST:
-                            subCommand = new ListCommand();
-                            break;
-                        case RELOAD:
-                            subCommand = new ReloadCommand();
-                            break;
-                        case RESET:
-                            subCommand = new ResetCommand();
-                            break;
-                        case RESTORE:
-                            subCommand = new RestoreCommand();
-                            break;
-                        case SAVE:
-                            subCommand = new SaveCommand();
-                            break;
-                    }
-                } else {
-                    RegionReset.sendMessage(player, RegionResetConfig.getText("error.unknownCommand")
-                            .replace("{0}", args[0]));
+    public boolean onCommand(final CommandSender sender, Command cmd, String label, final String[] args) {
+        SubCommand subCommand = null;
+        if (args.length > 0) {
+            Operation operation = Operation.getOperation(args[0]);
+            if (operation != null) {
+                if (operation.isPlayerCommand() && !(sender instanceof Player)) {
+                    sender.sendMessage(operation.name().toLowerCase() + " can only be executed by a player!");
+                    return true;
+                }
+
+                switch (operation) {
+                    case ADD:
+                        subCommand = new AddCommand();
+                        break;
+                    case BLUEPRINTS:
+                        subCommand = new BlueprintsCommand();
+                        break;
+                    case CHECK:
+                        subCommand = new CheckCommand();
+                        break;
+                    case CHECKDETAIL:
+                        subCommand = new CheckDetailCommand();
+                        break;
+                    case DEFINE:
+                        subCommand = new DefineCommand();
+                        break;
+                    case DELETE:
+                        subCommand = new DeleteCommand();
+                        break;
+                    case INFO:
+                        subCommand = new InfoCommand();
+                        break;
+                    case LIST:
+                        subCommand = new ListCommand();
+                        break;
+                    case RELOAD:
+                        subCommand = new ReloadCommand();
+                        break;
+                    case RESET:
+                        subCommand = new ResetCommand();
+                        break;
+                    case RESTORE:
+                        subCommand = new RestoreCommand();
+                        break;
+                    case SAVE:
+                        subCommand = new SaveCommand();
+                        break;
                 }
             } else {
-                subCommand = new HelpCommand();
-            }
-            if (subCommand != null) {
-                final SubCommand finalSubCommand = subCommand;
-
-                // execute the subcommand in a thread
-                RegionReset.getInstance().getServer().getScheduler().runTaskAsynchronously(RegionReset.getInstance(), new Runnable() {
-                    public void run() {
-                        finalSubCommand.execute(sender, args);
-                    }
-                });
+                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownCommand")
+                        .replace("{0}", args[0]));
             }
         } else {
-            sender.sendMessage("Command can only be executed by a player!");
+            subCommand = new HelpCommand();
         }
-        return false;
+        if (subCommand != null) {
+            final SubCommand finalSubCommand = subCommand;
+
+            // execute the subcommand in a thread
+            RegionReset.getInstance().getServer().getScheduler().runTaskAsynchronously(
+                    RegionReset.getInstance(), () -> finalSubCommand.execute(sender, args));
+        }
+        return true;
     }
 
     /**
@@ -114,18 +110,29 @@ public class RegionResetCommand implements CommandExecutor {
      * @author Jan
      */
     public enum Operation {
-        ADD,
+        ADD(true),
         BLUEPRINTS,
         CHECK,
         CHECKDETAIL,
-        DEFINE,
-        DELETE,
-        INFO,
+        DEFINE(true),
+        DELETE(true),
+        INFO(true),
         LIST,
         RELOAD,
-        RESET,
-        RESTORE,
-        SAVE;
+        RESET(true),
+        RESTORE(true),
+        SAVE(true);
+
+        private final boolean playerCommand;
+
+        Operation(boolean playerCommand) {
+            this.playerCommand = playerCommand;
+        }
+
+
+        Operation() {
+            playerCommand = false;
+        }
 
         /**
          * returns the matching operation
@@ -140,6 +147,10 @@ public class RegionResetCommand implements CommandExecutor {
                 }
             }
             return null;
+        }
+
+        public boolean isPlayerCommand() {
+            return playerCommand;
         }
     }
 
