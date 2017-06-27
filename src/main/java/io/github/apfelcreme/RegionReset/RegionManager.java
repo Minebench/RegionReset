@@ -134,7 +134,6 @@ public class RegionManager {
      * reloads the blueprint-config
      */
     public void reloadBlueprintConfig() {
-        saveBlueprintConfig();
         blueprintConfig = YamlConfiguration.loadConfiguration(blueprintConfigFile);
         saveBlueprintConfig();
     }
