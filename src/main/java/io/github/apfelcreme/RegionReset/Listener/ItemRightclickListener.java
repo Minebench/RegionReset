@@ -51,7 +51,7 @@ public class ItemRightclickListener implements Listener {
                     .getRegionManager(event.getClickedBlock().getWorld())
                     .getApplicableRegions(event.getClickedBlock().getLocation()).getRegions();
             for (ProtectedRegion region : regions) {
-                Blueprint blueprint = RegionManager.getInstance().getBlueprint(region);
+                Blueprint blueprint = RegionManager.getInstance().getBlueprint(event.getPlayer().getWorld(), region);
                 if (blueprint != null) {
                     event.getPlayer().sendMessage(RegionResetConfig.getText("info.rightClick")
                             .replace("{0}", region.getId())

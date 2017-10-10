@@ -49,7 +49,7 @@ public class RestoreCommand implements SubCommand {
                 String regionName = strings[1];
                 ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(sender.getWorld()).getRegion(regionName);
                 if (region != null) {
-                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(region);
+                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(sender.getWorld(), region);
                     if (blueprint != null) {
                         if (blueprint.getBlueprintFile().exists()) {
                             try {

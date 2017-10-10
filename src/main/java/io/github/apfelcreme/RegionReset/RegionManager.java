@@ -166,7 +166,7 @@ public class RegionManager {
             saveBlueprintConfig();
         }
 
-        Blueprint oldBlueprint = getBlueprint(region);
+        Blueprint oldBlueprint = getBlueprint(sender.getWorld(), region);
         if (oldBlueprint != null) {
             oldBlueprint.getRegions().remove(region);
         }
@@ -230,7 +230,7 @@ public class RegionManager {
      */
     public File resetRegion(Player sender, ProtectedRegion region)
             throws UnknownException, DifferentRegionSizeException, NonCuboidRegionException, ChunkNotLoadedException {
-        Blueprint blueprint = RegionManager.getInstance().getBlueprint(region);
+        Blueprint blueprint = RegionManager.getInstance().getBlueprint(sender.getWorld(), region);
         try {
             if (blueprint.getBlueprintFile().exists()) {
                 if (region != null) {
@@ -417,9 +417,9 @@ public class RegionManager {
      * @param region a worldguard region
      * @return the blueprint the region is assigned to
      */
-    public Blueprint getBlueprint(ProtectedRegion region) {
+    public Blueprint getBlueprint(World world, ProtectedRegion region) {
         for (Blueprint blueprint : blueprints) {
-            if (blueprint.getRegions().contains(region)) {
+            if (blueprint.getWorld() == world && blueprint.getRegions().contains(region)) {
                 return blueprint;
             }
         }
