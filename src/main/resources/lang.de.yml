@@ -11,6 +11,7 @@ texts:
     noSelection: '&c Du hast noch keine Auswahl mit WorldEdit getroffen!'
     regionNotAssigned: '&c Die Region wurde keinem Blueprint zugeordnet!'
     unknownBlueprint: '&c Der Blueprint {0} existiert nicht!'
+    unknownBlueprintFile:  '&c Die Datei für Blueprint {0} fehlt in {1}!'
     unknownException: '&c Es ist ein unerwartetet Fehler aufgetreten: {0}!'
     unknownCommand: '&c Die Funktion {0} existiert nicht!'
     unknownRegion: '&c Die Region {0} existiert nicht!'

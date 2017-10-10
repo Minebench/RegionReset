@@ -2,6 +2,7 @@ package io.github.apfelcreme.RegionReset.Commands;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
+import io.github.apfelcreme.RegionReset.Exceptions.MissingFileException;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
@@ -49,13 +50,18 @@ public class AddCommand implements SubCommand {
                 if (region != null) {
                     Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
                     if (blueprint != null) {
-                        RegionManager.getInstance().addRegion(sender, region, blueprint);
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("info.add.added")
-                                .replace("{0}", regionName));
-                        RegionReset.getInstance().getLogger()
-                                .info("Region '" + region.getId() + "' in World '" + blueprint.getWorld().getName()
-                                        + "' has been added to the blueprint '"
-                                        + blueprint.getName() + "' by " + sender.getName());
+                        try {
+                            RegionManager.getInstance().addRegion(sender, region, blueprint);
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.add.added")
+                                    .replace("{0}", regionName));
+                            RegionReset.getInstance().getLogger()
+                                    .info("Region '" + region.getId() + "' in World '" + blueprint.getWorld().getName()
+                                            + "' has been added to the blueprint '"
+                                            + blueprint.getName() + "' by " + sender.getName());
+                        } catch (MissingFileException e) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprintFile")
+                                    .replace("{0}", blueprint.getName()).replace("{1}", e.getFile().getPath()));
+                        }
                     } else {
                         RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprint")
                                 .replace("{0}", blueprintName));

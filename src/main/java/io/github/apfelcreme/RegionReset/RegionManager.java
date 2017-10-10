@@ -144,10 +144,11 @@ public class RegionManager {
      * @param sender    the name of the executing player
      * @param region    the region that shall be added to the blueprint
      * @param blueprint the blueprint the region shall be added to
+     * @throws MissingFileException if the file for this blueprint doesn't exist
      */
-    public void addRegion(Player sender, ProtectedRegion region, Blueprint blueprint) {
+    public void addRegion(Player sender, ProtectedRegion region, Blueprint blueprint) throws MissingFileException {
         if (!blueprint.getBlueprintFile().exists()) {
-            return;
+            throw new MissingFileException(blueprint.getBlueprintFile());
         }
 
         // delete multiple entries + the current one
@@ -163,6 +164,11 @@ public class RegionManager {
             regions.remove(region.getId());
             worldConfig.set(key, regions);
             saveBlueprintConfig();
+        }
+
+        Blueprint oldBlueprint = getBlueprint(region);
+        if (oldBlueprint != null) {
+            oldBlueprint.getRegions().remove(region);
         }
 
         List<String> regions = worldConfig.getStringList(blueprint.getName());
