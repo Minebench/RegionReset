@@ -74,7 +74,7 @@ public class SchematicUtils {
             int height = Math.abs(region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY()) + 1;
             int width = Math.abs(region.getMaximumPoint().getBlockZ() - region.getMinimumPoint().getBlockZ()) + 1;
 
-            if (length != clipboard.getSize().getBlockX() || height != clipboard.getSize().getBlockY() || width != clipboard.getSize().getBlockZ()) {
+            if (width != clipboard.getSize().getBlockX() || height != clipboard.getSize().getBlockY() || length != clipboard.getSize().getBlockZ()) {
                 throw new DifferentRegionSizeException(region.getId(), schematicFile.getName());
             }
 
