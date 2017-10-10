@@ -55,9 +55,11 @@ public class ResetCommand implements SubCommand {
                     if (blueprint != null) {
                         try {
                             File backupFile = RegionManager.getInstance().resetRegion(sender, region);
-                            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.reset.reset")
-                                    .replace("{0}", regionName)
-                                    .replace("{1}", backupFile.getName()));
+                            if (backupFile != null) {
+                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.reset.reset")
+                                        .replace("{0}", regionName)
+                                        .replace("{1}", backupFile.getName()));
+                            }
                         } catch (UnknownException e) {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")
                                     .replace("{0}", e.getException().getClass().getName()));
@@ -70,6 +72,9 @@ public class ResetCommand implements SubCommand {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noCuboidRegion"));
                         } catch (ChunkNotLoadedException e) {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
+                        } catch (MissingFileException e) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprintFile")
+                                    .replace("{0}", blueprint.getName()).replace("{1}", e.getFile().getPath()));
                         }
                     } else {
                         RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));

@@ -229,8 +229,12 @@ public class RegionManager {
      * @throws ChunkNotLoadedException
      */
     public File resetRegion(Player sender, ProtectedRegion region)
-            throws UnknownException, DifferentRegionSizeException, NonCuboidRegionException, ChunkNotLoadedException {
+            throws UnknownException, DifferentRegionSizeException, NonCuboidRegionException, ChunkNotLoadedException, MissingFileException {
         Blueprint blueprint = RegionManager.getInstance().getBlueprint(sender.getWorld(), region);
+        if (blueprint == null) {
+            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));
+            return null;
+        }
         try {
             if (blueprint.getBlueprintFile().exists()) {
                 if (region != null) {
@@ -252,7 +256,12 @@ public class RegionManager {
                     } else {
                         throw new NonCuboidRegionException(region.getId());
                     }
+                } else {
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
+                            .replace("{0}", "???"));
                 }
+            } else {
+                throw new MissingFileException(blueprint.getBlueprintFile());
             }
         } catch (DataException | EmptyClipboardException | StorageException | MaxChangedBlocksException e) {
             // MaxChangedBlocksException shouldn't be happening as the EditSession can paste Integer.MAX_VALUE
