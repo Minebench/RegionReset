@@ -28,7 +28,8 @@ import java.util.*;
  * @author Lord36 aka Apfelcreme
  */
 public class CheckCommand implements SubCommand {
-
+    
+    private final static long MSPERDAY = 86400000;
     /**
      * executes the command
      *
@@ -38,14 +39,13 @@ public class CheckCommand implements SubCommand {
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
 
-        final long MSPERDAY = 86400000;
         if (commandSender.hasPermission("RegionReset.check")) {
             if (strings.length > 1) {
                 String blueprintName = strings[1];
                 Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
                 if (blueprint != null) {
                     int page = 0;
-                    if (strings.length > 2 && RegionReset.isNumeric(strings[1])) {
+                    if (strings.length > 2 && RegionReset.isNumeric(strings[2])) {
                         page = Integer.parseInt(strings[1]) - 1;
                     }
 
@@ -76,7 +76,7 @@ public class CheckCommand implements SubCommand {
                             }
 
                             //print the results
-                            if (!atLeastOneActivePlayer) {
+                            if (!members.isEmpty() && !atLeastOneActivePlayer) {
                                 RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.check.element")
                                         .replace("{0}", blueprint.getRegions().get(i).getId())
                                         .replace("{1}", blueprint.getRegions().get(i).getId()));
