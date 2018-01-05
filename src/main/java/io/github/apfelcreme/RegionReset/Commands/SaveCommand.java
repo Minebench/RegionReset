@@ -8,6 +8,7 @@ import io.github.apfelcreme.RegionReset.Exceptions.UnknownException;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -36,22 +37,40 @@ public class SaveCommand implements SubCommand {
     /**
      * executes the command
      *
-     * @param commandSender the sender
-     * @param strings       the command args
+     * @param sender  the sender
+     * @param strings the command args
      */
-    public void execute(CommandSender commandSender, String[] strings) {
-        Player sender = (Player) commandSender;
+    public void execute(CommandSender sender, String[] strings) {
         if (sender.hasPermission("RegionReset.save")) {
             if (strings.length >= 2) {
                 String regionName = strings[1];
-                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(sender.getWorld()).getRegion(regionName);
+                
+                World world = null;
+                if (sender instanceof Player) {
+                    world = ((Player) sender).getWorld();
+                } else if (strings.length > 2) {
+                    world = RegionReset.getInstance().getServer().getWorld(strings[2]);
+                    if (world == null) {
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownWorld")
+                                .replace("{0}", strings[2]));
+                        return;
+                    }
+                }
+    
+                if (world == null) {
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")
+                            .replace("{0}", "/rr save <Region> <World>"));
+                    return;
+                }
+                
+                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(regionName);
                 if (region != null) {
                     try {
-                        RegionManager.getInstance().saveRegion(sender, region);
+                        RegionManager.getInstance().saveRegion(sender, region, world);
                         RegionReset.sendMessage(sender, RegionResetConfig.getText("info.save.saved")
                                 .replace("{0}", regionName));
                         RegionReset.getInstance().getLogger()
-                                .info("Region '" + region.getId() + "' in World '" + sender.getWorld().getName()
+                                .info("Region '" + region.getId() + "' in World '" + sender.getName()
                                         + "' has been saved by '" + sender.getName() + "'");
                     } catch (UnknownException e) {
                         RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")

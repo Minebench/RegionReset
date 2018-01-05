@@ -4,6 +4,7 @@ import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -30,7 +31,9 @@ import java.util.*;
  * @author Lord36 aka Apfelcreme
  */
 public class CheckDetailCommand implements SubCommand {
-
+    
+    static final long MSPERDAY = 86400000;
+    
     /**
      * executes the command
      *
@@ -38,7 +41,6 @@ public class CheckDetailCommand implements SubCommand {
      * @param strings       the command args
      */
     public void execute(CommandSender commandSender, String[] strings) {
-        final long MSPERDAY = 86400000;
         if (commandSender.hasPermission("RegionReset.checkDetail")) {
             if (strings.length > 1) {
                 String blueprintName = strings[1];
@@ -67,8 +69,9 @@ public class CheckDetailCommand implements SubCommand {
                             Map<UUID, Long> offlineTimes = new HashMap<>();
                             for (UUID uuid : members) {
                                 long lastLogout = 0;
-                                if (RegionReset.getInstance().getServer().getOfflinePlayer(uuid) != null) {
-                                   lastLogout = RegionReset.getInstance().getServer().getOfflinePlayer(uuid).getLastPlayed();
+                                OfflinePlayer member = RegionReset.getInstance().getServer().getOfflinePlayer(uuid);
+                                if (member != null && member.hasPlayedBefore()) {
+                                    lastLogout = member.getLastPlayed();
                                 }
                                 Long offlineTime = new Date().getTime() - lastLogout;
                                 offlineTimes.put(uuid, offlineTime);

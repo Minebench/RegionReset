@@ -15,6 +15,7 @@ texts:
     unknownException: '&c Es ist ein unerwartetet Fehler aufgetreten: {0}!'
     unknownCommand: '&c Die Funktion {0} existiert nicht!'
     unknownRegion: '&c Die Region {0} existiert nicht!'
+    unknownWorld: '&c Die Welt {0} existiert nicht!'
     wrongUsage: '&c Falsche Eingabe: Probiere {0}!'
   info:
     add:

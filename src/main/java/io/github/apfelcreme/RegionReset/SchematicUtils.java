@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -211,12 +212,11 @@ public class SchematicUtils {
     /**
      * Looks for signs with the sell line from PlotSigns written on the recently reset region.
      * If there is one, things will be written on it.
-     *
-     * @param sender a player
+     *  @param sender a player
      * @param region the region that shall be inspected
      * @param world  the world the region is in
      */
-    public static void buildPlotSignsSign(final Player sender, final ProtectedRegion region, final World world) {
+    public static void buildPlotSignsSign(final CommandSender sender, final ProtectedRegion region, final World world) {
         if (RegionReset.getInstance().getPlotSigns() == null) {
             return;
         }
@@ -262,7 +262,7 @@ public class SchematicUtils {
         }
     }
 
-    public static void removeProtections(Player sender, ProtectedRegion region, World world) {
+    public static void removeProtections(CommandSender sender, ProtectedRegion region, World world) {
         if (RegionReset.getInstance().getLWC() != null) {
             Bukkit.getScheduler().runTaskAsynchronously(RegionReset.getInstance(), () -> {
                 LWC.getInstance().fastRemoveProtections(sender,

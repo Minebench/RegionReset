@@ -6,6 +6,7 @@ import io.github.apfelcreme.RegionReset.Exceptions.MissingFileException;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -34,24 +35,42 @@ public class AddCommand implements SubCommand {
     /**
      * executes the command
      *
-     * @param commandSender the sender
-     * @param strings       the command args
+     * @param sender  the sender
+     * @param strings the command args
      */
-    public void execute(CommandSender commandSender, String[] strings) {
+    public void execute(CommandSender sender, String[] strings) {
 
         // Fügt eine Region zu einem Blueprint hinzu
 
-        Player sender = (Player) commandSender;
         if (sender.hasPermission("RegionReset.add")) {
             if (strings.length > 2) {
                 String regionName = strings[1];
                 String blueprintName = strings[2].replace(".schematic", "");
-                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(sender.getWorld()).getRegion(strings[1]);
+    
+                World world = null;
+                if (sender instanceof Player) {
+                    world = ((Player) sender).getWorld();
+                } else if (strings.length > 3) {
+                    world = RegionReset.getInstance().getServer().getWorld(strings[2]);
+                    if (world == null) {
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownWorld")
+                                .replace("{0}", strings[3]));
+                        return;
+                    }
+                }
+    
+                if (world == null) {
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")
+                            .replace("{0}", "/rr add <Region> <Blueprint> <World>"));
+                    return;
+                }
+                
+                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(strings[1]);
                 if (region != null) {
                     Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
                     if (blueprint != null) {
                         try {
-                            RegionManager.getInstance().addRegion(sender, region, blueprint);
+                            RegionManager.getInstance().addRegion(sender, region, blueprint, world);
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("info.add.added")
                                     .replace("{0}", regionName));
                             RegionReset.getInstance().getLogger()

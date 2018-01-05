@@ -8,6 +8,7 @@ import io.github.apfelcreme.RegionReset.Exceptions.UnknownException;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -36,28 +37,46 @@ public class RestoreCommand implements SubCommand {
     /**
      * executes the command
      *
-     * @param commandSender the sender
-     * @param strings       the command args
+     * @param sender  the sender
+     * @param strings the command args
      */
-    public void execute(CommandSender commandSender, String[] strings) {
+    public void execute(CommandSender sender, String[] strings) {
 
         //restores a region
 
-        Player sender = (Player) commandSender;
         if (sender.hasPermission("RegionReset.restore")) {
             if (strings.length > 1) {
                 String regionName = strings[1];
-                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(sender.getWorld()).getRegion(regionName);
+                
+                World world = null;
+                if (sender instanceof Player) {
+                    world = ((Player) sender).getWorld();
+                } else if (strings.length > 2) {
+                    world = RegionReset.getInstance().getServer().getWorld(strings[2]);
+                    if (world == null) {
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownWorld")
+                                .replace("{0}", strings[2]));
+                        return;
+                    }
+                }
+    
+                if (world == null) {
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")
+                            .replace("{0}", "/rr restore <Region> <World>"));
+                    return;
+                }
+                
+                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(regionName);
                 if (region != null) {
-                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(sender.getWorld(), region);
+                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(world, region);
                     if (blueprint != null) {
                         if (blueprint.getBlueprintFile().exists()) {
                             try {
-                                RegionManager.getInstance().restoreRegion(sender, region);
+                                RegionManager.getInstance().restoreRegion(sender, region, world);
                                 RegionReset.sendMessage(sender, RegionResetConfig.getText("info.restore.restored")
                                         .replace("{0}", regionName));
                                 RegionReset.getInstance().getLogger()
-                                        .info("Region '" + region.getId() + "' in World '" + sender.getWorld().getName()
+                                        .info("Region '" + region.getId() + "' in World '" + world.getName()
                                                 + "' has been restored by " + sender.getName());
                             } catch (UnknownException e) {
                                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")

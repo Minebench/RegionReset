@@ -10,6 +10,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
 import io.github.apfelcreme.RegionReset.Exceptions.*;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -144,19 +145,20 @@ public class RegionManager {
      * @param sender    the name of the executing player
      * @param region    the region that shall be added to the blueprint
      * @param blueprint the blueprint the region shall be added to
+     * @param world
      * @throws MissingFileException if the file for this blueprint doesn't exist
      */
-    public void addRegion(Player sender, ProtectedRegion region, Blueprint blueprint) throws MissingFileException {
+    public void addRegion(CommandSender sender, ProtectedRegion region, Blueprint blueprint, World world) throws MissingFileException {
         if (!blueprint.getBlueprintFile().exists()) {
             throw new MissingFileException(blueprint.getBlueprintFile());
         }
 
         // delete multiple entries + the current one
-        if (blueprintConfig.getConfigurationSection(sender.getWorld().getName()) == null) {
-            blueprintConfig.createSection(sender.getWorld().getName());
+        if (blueprintConfig.getConfigurationSection(world.getName()) == null) {
+            blueprintConfig.createSection(world.getName());
             saveBlueprintConfig();
         }
-        ConfigurationSection worldConfig = blueprintConfig.getConfigurationSection(sender.getWorld().getName());
+        ConfigurationSection worldConfig = blueprintConfig.getConfigurationSection(world.getName());
 
         //remove duplicate entry
         for (String key : worldConfig.getKeys(true)) {
@@ -166,7 +168,7 @@ public class RegionManager {
             saveBlueprintConfig();
         }
 
-        Blueprint oldBlueprint = getBlueprint(sender.getWorld(), region);
+        Blueprint oldBlueprint = getBlueprint(world, region);
         if (oldBlueprint != null) {
             oldBlueprint.getRegions().remove(region);
         }
@@ -174,7 +176,7 @@ public class RegionManager {
         List<String> regions = worldConfig.getStringList(blueprint.getName());
 
         regions.add(region.getId());
-        blueprintConfig.getConfigurationSection(sender.getWorld().getName()).set(blueprint.getName(),
+        blueprintConfig.getConfigurationSection(world.getName()).set(blueprint.getName(),
                 regions);
 
         blueprint.getRegions().add(region);
@@ -186,16 +188,17 @@ public class RegionManager {
      *
      * @param sender the name of the executing player
      * @param region the region that shall be restored
+     * @param world
      * @throws DifferentRegionSizeException
      * @throws UnknownException
      * @throws ChunkNotLoadedException
      */
-    public void restoreRegion(Player sender, ProtectedRegion region)
+    public void restoreRegion(CommandSender sender, ProtectedRegion region, World world)
             throws DifferentRegionSizeException, UnknownException, ChunkNotLoadedException {
         if (region != null) {
-            File restoreSchematic = new File(plugin.getDataFolder() + "/backups/" + sender.getWorld().getName() + "/" + region.getId() + ".schematic");
+            File restoreSchematic = new File(plugin.getDataFolder() + "/backups/" + world.getName() + "/" + region.getId() + ".schematic");
             if (restoreSchematic.exists()) {
-                File informationFile = new File(plugin.getDataFolder() + "/backups/" + sender.getWorld().getName() + "/" + region.getId() + ".yml");
+                File informationFile = new File(plugin.getDataFolder() + "/backups/" + world.getName() + "/" + region.getId() + ".yml");
                 if (informationFile.exists()) {
                     FileConfiguration config = YamlConfiguration.loadConfiguration(informationFile);
                     List<String> ownerUUIDs = config.getStringList(region.getId() + ".owners");
@@ -209,7 +212,7 @@ public class RegionManager {
                 }
                 try {
                     SchematicUtils.pasteBlueprint(restoreSchematic, false,
-                            region, sender.getWorld());
+                            region, world);
                 } catch (MaxChangedBlocksException e) { // MaxChangedBlocksException shouldn't be happening as the EditSession can paste Integer.MAX_VALUE
                     throw new UnknownException(e);
                 }
@@ -220,17 +223,18 @@ public class RegionManager {
     /**
      * resets a region to a set blueprint
      *
-     * @param sender the executing player
+     * @param sender the executing sender
      * @param region the region that shall be reset
+     * @param world  the world the region is in
      * @return the File the backup has been saved into
      * @throws UnknownException
      * @throws DifferentRegionSizeException
      * @throws NonCuboidRegionException
      * @throws ChunkNotLoadedException
      */
-    public File resetRegion(Player sender, ProtectedRegion region)
+    public File resetRegion(CommandSender sender, ProtectedRegion region, World world)
             throws UnknownException, DifferentRegionSizeException, NonCuboidRegionException, ChunkNotLoadedException, MissingFileException {
-        Blueprint blueprint = RegionManager.getInstance().getBlueprint(sender.getWorld(), region);
+        Blueprint blueprint = RegionManager.getInstance().getBlueprint(world, region);
         if (blueprint == null) {
             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));
             return null;
@@ -240,17 +244,17 @@ public class RegionManager {
                 if (region != null) {
                     if (region.getType() == RegionType.CUBOID) {
                         File backupFile = new File(plugin.getDataFolder()
-                                + "/backups/" + sender.getWorld().getName() + "/" + region.getId() + ".schematic");
-                        SchematicUtils.saveSchematic(backupFile, region, sender.getWorld());
-                        SchematicUtils.pasteBlueprint(blueprint.getBlueprintFile(), false, region, sender.getWorld());
+                                + "/backups/" + world.getName() + "/" + region.getId() + ".schematic");
+                        SchematicUtils.saveSchematic(backupFile, region, world);
+                        SchematicUtils.pasteBlueprint(blueprint.getBlueprintFile(), false, region, world);
                         if (plugin.getPlotSigns() != null) {
-                            SchematicUtils.buildPlotSignsSign(sender, region, sender.getWorld());
+                            SchematicUtils.buildPlotSignsSign(sender, region, world);
                         }
-                        SchematicUtils.removeProtections(sender, region, sender.getWorld());
+                        SchematicUtils.removeProtections(sender, region, world);
                         region.getOwners().removeAll();
                         region.getMembers().removeAll();
-                        plugin.getWorldGuard().getRegionManager(sender.getWorld()).save();
-                        plugin.getLogger().info("Region '" + region.getId() + "' in World '" + sender.getWorld().getName()
+                        plugin.getWorldGuard().getRegionManager(world).save();
+                        plugin.getLogger().info("Region '" + region.getId() + "' in World '" + world.getName()
                                 + "' has been reset by " + sender.getName());
                         return backupFile;
                     } else {
@@ -278,18 +282,19 @@ public class RegionManager {
      *
      * @param sender the player that does the action
      * @param region the region that is the copy base
+     * @param world
      * @throws NonCuboidRegionException
      * @throws UnknownException
      * @throws ChunkNotLoadedException
      */
-    public void saveRegion(Player sender, ProtectedRegion region)
+    public void saveRegion(CommandSender sender, ProtectedRegion region, World world)
             throws NonCuboidRegionException, UnknownException, ChunkNotLoadedException {
         if (region != null) {
             File saveFile = new File(plugin.getDataFolder()
-                    + "/backups/" + sender.getWorld().getName() + "/" + region.getId() + ".schematic");
+                    + "/backups/" + world.getName() + "/" + region.getId() + ".schematic");
             if (region.getType() == RegionType.CUBOID) {
                 try {
-                    SchematicUtils.saveSchematic(saveFile, region, sender.getWorld());
+                    SchematicUtils.saveSchematic(saveFile, region, world);
                 } catch (EmptyClipboardException | DataException e) {
                     throw new UnknownException(e);
                 } catch (IOException e) {
