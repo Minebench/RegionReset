@@ -78,15 +78,8 @@ public class SchematicUtils {
             if (width != clipboard.getSize().getBlockX() || height != clipboard.getSize().getBlockY() || length != clipboard.getSize().getBlockZ()) {
                 throw new DifferentRegionSizeException(region.getId(), schematicFile.getName());
             }
-
-            // Check if chunks are loaded
-            for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
-                for (int z = region.getMinimumPoint().getBlockZ(); z < region.getMaximumPoint().getBlockZ(); z++) {
-                    if (!world.isChunkLoaded(x >> 4, z >> 4)) {
-                        throw new ChunkNotLoadedException();
-                    }
-                }
-            }
+            
+            loadChunks(world, region);
 
             clipboard.paste(editSession, region.getMinimumPoint(), noAir);
             editSession.flushQueue();
@@ -117,14 +110,8 @@ public class SchematicUtils {
             schematicFile.getParentFile().mkdirs();
         }
 
-        // Check if chunks are loaded
-        for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
-            for (int z = region.getMinimumPoint().getBlockZ(); z < region.getMaximumPoint().getBlockZ(); z++) {
-                if (!world.isChunkLoaded(x >> 4, z >> 4)) {
-                    throw new ChunkNotLoadedException();
-                }
-            }
-        }
+        loadChunks(world, region);
+        
         // save the schematic
         EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), -1);
         CuboidClipboard clipboard = new CuboidClipboard(
@@ -165,9 +152,41 @@ public class SchematicUtils {
         config.save(informationFile);
 
     }
-
+    
     /**
+     * Load all chunks
+     *
+     * @param world The world the chunks are in
+     * @param minX The x coordinate of the minimum location
+     * @param minZ The z coordinate of the minimum location
+     * @param maxX The x coordinate of the maximum location
+     * @param maxZ The z coordinate of the maximum location
+     * @throws ChunkNotLoadedException
      */
+    private static void loadChunks(World world, int minX, int minZ, int maxX, int maxZ) throws ChunkNotLoadedException {
+        // Check if chunks are loaded
+        for (int x = minX >> 4; x <= maxX >> 4; x++) {
+            for (int z = minZ >> 4; z < maxZ >> 4; z++) {
+                if (!world.isChunkLoaded(x, z)) {
+                    if (!world.loadChunk(x, z, false)) {
+                        throw new ChunkNotLoadedException();
+                    }
+                }
+            }
+        }
+    }
+    
+    private static void loadChunks(World world, ProtectedRegion region) throws ChunkNotLoadedException {
+        loadChunks(world,
+                region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockZ(),
+                region.getMaximumPoint().getBlockX(), region.getMaximumPoint().getBlockZ());
+    }
+    
+    private static void loadChunks(Selection selection) throws ChunkNotLoadedException {
+        loadChunks(selection.getWorld(),
+                selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockZ(),
+                selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockZ());
+    }
 
     /**
      * saves a selection as a blueprint
@@ -188,14 +207,8 @@ public class SchematicUtils {
             blueprint.getBlueprintFile().getParentFile().mkdirs();
         }
 
-        // Check if chunks are loaded
-        for (int x = selection.getMinimumPoint().getBlockX(); x <= selection.getMaximumPoint().getBlockX(); x++) {
-            for (int z = selection.getMinimumPoint().getBlockZ(); z < selection.getMaximumPoint().getBlockZ(); z++) {
-                if (!selection.getWorld().isChunkLoaded(x >> 4, z >> 4)) {
-                    throw new ChunkNotLoadedException();
-                }
-            }
-        }
+        loadChunks(selection);
+        
         // save the schematic
         EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(selection.getWorld()), -1);
         CuboidClipboard clipboard = new CuboidClipboard(
@@ -208,7 +221,7 @@ public class SchematicUtils {
 
         SchematicFormat.MCEDIT.save(clipboard, blueprint.getBlueprintFile());
     }
-
+    
     /**
      * Looks for signs with the sell line from PlotSigns written on the recently reset region.
      * If there is one, things will be written on it.
