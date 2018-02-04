@@ -110,18 +110,18 @@ public class RegionResetCommand implements CommandExecutor {
      * @author Jan
      */
     public enum Operation {
-        ADD(true),
+        ADD,
         BLUEPRINTS,
         CHECK,
         CHECKDETAIL,
         DEFINE(true),
         DELETE(true),
-        INFO(true),
+        INFO,
         LIST,
         RELOAD,
-        RESET(true),
-        RESTORE(true),
-        SAVE(true);
+        RESET,
+        RESTORE,
+        SAVE;
 
         private final boolean playerCommand;
 
