@@ -46,7 +46,7 @@ public class CheckCommand implements SubCommand {
                 if (blueprint != null) {
                     int page = 0;
                     if (strings.length > 2 && RegionReset.isNumeric(strings[2])) {
-                        page = Integer.parseInt(strings[1]) - 1;
+                        page = Integer.parseInt(strings[2]) - 1;
                     }
 
                     Integer pageSize = RegionReset.getInstance().getConfig().getInt("pageSize");
