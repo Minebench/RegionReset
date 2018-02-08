@@ -25,17 +25,17 @@ texts:
       worldHeader: '&2 {0}&8:'
       element: '&7 - {0} &8[{1} Regionen]'
     check:
-      header: '&a Alle Regionen des Blueprints &2{0}&a, deren Eigner seit &2{1}&a Tagen offline sind: &2(&a{2]&2/&a{3}&2)'
-      element: '&8 - &2{0}: &c&o/rr reset {1}'
-      footer: '&a Für andere Seiten: &2/rr check <Blueprint> <#>'
+      header: '&a Alle Regionen des Blueprints &2{blueprint}&a, deren Eigner seit &2{reset-limit}&a Tagen offline sind: &2(&a{page]&2/&a{last-page}&2)'
+      element: '&8 - &2[{region}](hover=&2Name: &f{region}\n&2Besitzer:&f {owners}\n&2Mitglieder:&f {members}): &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
+      footer: '&a Für andere Seiten: [&2/rr check <Blueprint> <#>](suggest_command=/rr check {blueprint})'
     checkDetail:
-      header: '&a Alle Regionen des Blueprints &2{0}&a, deren Eigner seit &2{1}&a Tagen offline sind: &2(&a{2}&2/&a{3}&2)'
-      member: '&8   - &7{0}: &8{1}'
+      header: '&a Alle Regionen des Blueprints &2{blueprint}&a, deren Eigner seit &2{reset-limit}&a Tagen offline sind: &2(&a{page]&2/&a{last-page}&2)'
+      member: '&8   - &7{player}: &8{offline-time}'
       name: '&2{0} &8{1}'
-      region1: '&8 - &2{0}: &aBereit zum Reset'
-      region2: '&8 - &2{0}: &cNicht bereit zum Reset'
-      region3: '&8 - &2{0}: &7Keine Owner/Member'
-      footer: '&a Für andere Seiten: &2/rr checkdetail <Blueprint> <#>'
+      region1: '&8 - &2{region}: &aBereit zum Reset &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
+      region2: '&8 - &2{region}: &cNicht bereit zum Reset &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
+      region3: '&8 - &2{region}: &7Keine Owner/Member &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
+      footer: '&a Für andere Seiten: [&2/rr checkdetail <Blueprint> <#>](suggest_command=/rr checkdetail {blueprint})'
     define:
       defined: '&a Du hast den Blueprint &2{0}&a erfolgreich definiert'
     delete:

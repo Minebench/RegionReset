@@ -1,5 +1,6 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
@@ -56,16 +57,17 @@ public class CheckDetailCommand implements SubCommand {
                     if (page >= maxPages - 1) {
                         page = maxPages - 1;
                     }
-                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.header")
-                            .replace("{0}", blueprint.getName())
-                            .replace("{1}", Integer.toString(RegionReset.getInstance().getConfig().getInt("resetLimit")))
-                            .replace("{2}", Integer.toString(page + 1))
-                            .replace("{3}", maxPages.toString()));
+                    RegionReset.sendConfigMessage(commandSender, "info.checkDetail.header",
+                            "blueprint", blueprint.getName(),
+                            "reset-limit", Integer.toString(RegionReset.getInstance().getConfig().getInt("resetLimit")),
+                            "page", Integer.toString(page + 1),
+                            "last-page", maxPages.toString());
                     for (int i = page * pageSize; i < (page * pageSize) + pageSize; i++) {
                         if (i < blueprint.getRegions().size() && blueprint.getRegions().size() > 0) {
                             boolean atLeastOneActivePlayer = false;
-                            List<UUID> members = new ArrayList<>(blueprint.getRegions().get(i).getOwners().getUniqueIds());
-                            members.addAll(new ArrayList<>(blueprint.getRegions().get(i).getMembers().getUniqueIds()));
+                            ProtectedRegion region = blueprint.getRegions().get(i);
+                            List<UUID> members = new ArrayList<>(region.getOwners().getUniqueIds());
+                            members.addAll(new ArrayList<>(region.getMembers().getUniqueIds()));
                             Map<UUID, Long> offlineTimes = new HashMap<>();
                             for (UUID uuid : members) {
                                 long lastLogout = 0;
@@ -81,26 +83,24 @@ public class CheckDetailCommand implements SubCommand {
                             }
 
                             //print the results
+                            String messageKey = "info.checkDetail.region2";
                             if (members.size() == 0) {
-                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.region3")
-                                        .replace("{0}", blueprint.getRegions().get(i).getId()));
+                                messageKey = "info.checkDetail.region3";
                             } else if (!atLeastOneActivePlayer) {
-                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.region1")
-                                        .replace("{0}", blueprint.getRegions().get(i).getId()));
-                            } else {
-                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.region2")
-                                        .replace("{0}", blueprint.getRegions().get(i).getId()));
+                                messageKey = "info.checkDetail.region1";
                             }
+                            RegionReset.sendConfigMessage(commandSender, messageKey,
+                                    "region", region.getId());
                             for (Map.Entry<UUID, Long> entry : offlineTimes.entrySet()) {
                                 String name = RegionReset.getInstance().getNameByUUID(entry.getKey());
                                 String offlineTime = RegionReset.formatTimeDifference(entry.getValue());
-                                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.member")
-                                        .replace("{0}", name)
-                                        .replace("{1}", offlineTime));
+                                RegionReset.sendConfigMessage(commandSender, "info.checkDetail.member",
+                                        "player", name,
+                                        "offline-time", offlineTime);
                             }
                         }
                     }
-                    RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.checkDetail.footer"));
+                    RegionReset.sendConfigMessage(commandSender, "info.checkDetail.footer", "blueprint", blueprint.getName());
                 } else {
                     RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.unknownBlueprint")
                             .replace("{0}", blueprintName));

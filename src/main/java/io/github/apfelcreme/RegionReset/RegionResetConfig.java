@@ -1,6 +1,9 @@
 package io.github.apfelcreme.RegionReset;
 
-import org.bukkit.ChatColor;
+import de.themoep.minedown.MineDown;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -59,13 +62,26 @@ public class RegionResetConfig {
      * @param key the config path
      * @return the text
      */
-    public static String getText(String key) {
+    public static String getText(String key, String... replacements) {
+        return TextComponent.toLegacyText(getComponents(key, replacements));
+    }
+    
+    /**
+     * returns a componenty string
+     *
+     * @param key the config path
+     * @return the components
+     */
+    public static BaseComponent[] getComponents(String key, String... replacements) {
         String ret = (String) languageConfig.get("texts." + key);
         if (ret != null && !ret.isEmpty()) {
-            ret = ChatColor.translateAlternateColorCodes('&', ret);
-            return ChatColor.translateAlternateColorCodes('§', ret);
+            MineDown md = new MineDown(ret).placeholderPrefix('{').placeholderSuffix('}').replace(replacements);
+            for (int i = 0; i * 2 + 1 < replacements.length; i+=2) {
+                md.replacer().replacements().put(String.valueOf(i), replacements[i * 2 + 1]);
+            }
+            return md.toComponent();
         } else {
-            return "Missing text node: " + key;
+            return new ComponentBuilder("Missing text node: " + key).create();
         }
     }
 

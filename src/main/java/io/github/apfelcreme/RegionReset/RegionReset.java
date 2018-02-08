@@ -4,7 +4,10 @@ import com.griefcraft.lwc.LWC;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import de.minebench.plotsigns.PlotSigns;
+import de.themoep.minedown.MineDown;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.zaiyers.UUIDDB.core.UUIDDBPlugin;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -148,7 +151,30 @@ public class RegionReset extends JavaPlugin {
      * @param message the message
      */
     public static void sendMessage(CommandSender player, String message) {
-        player.sendMessage(RegionResetConfig.getText("prefix") + message);
+        sendMessage(player, MineDown.parse(message));
+    }
+    
+    /**
+     * sends a message to a player
+     *
+     * @param player  the player the message shall be sent to
+     * @param message the message
+     */
+    public static void sendMessage(CommandSender player, BaseComponent[] message) {
+        player.spigot().sendMessage(
+                new ComponentBuilder("")
+                        .append(RegionResetConfig.getComponents("prefix"))
+                        .append(message).create());
+    }
+    
+    /**
+     * sends a message to a player
+     *
+     * @param player  the player the message shall be sent to
+     * @param key     the messages's config key
+     */
+    public static void sendConfigMessage(CommandSender player, String key, String... replacements) {
+        sendMessage(player, RegionResetConfig.getComponents(key, replacements));
     }
 
     /**
