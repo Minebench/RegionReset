@@ -19,6 +19,7 @@ permissions:
     description: package of all permissions
     children: 
       RegionReset.add: true
+      RegionReset.blueprints: true
       RegionReset.check: true
       RegionReset.checkDetail: true
       RegionReset.define: true
@@ -30,6 +31,8 @@ permissions:
       RegionReset.save: true
   RegionReset.add:
     description: add a region to a blueprint
+  RegionReset.blueprints:
+    description: show a list of all blueprints
   RegionReset.check:
     description: show a list of all regions of a blueprint and their status
   RegionReset.checkDetail:

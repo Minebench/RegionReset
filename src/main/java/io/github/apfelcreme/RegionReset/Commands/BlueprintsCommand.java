@@ -39,7 +39,7 @@ public class BlueprintsCommand implements SubCommand {
      * @param strings       the command args
      */
     public void execute(CommandSender commandSender, String[] strings) {
-        if (commandSender.hasPermission("RegionReset.list")) {
+        if (commandSender.hasPermission("RegionReset.blueprints")) {
             RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.blueprints.header"));
             for (World world : RegionReset.getInstance().getServer().getWorlds()) {
                 List<Blueprint> worldBlueprints = RegionManager.getInstance().getBlueprints(world);
