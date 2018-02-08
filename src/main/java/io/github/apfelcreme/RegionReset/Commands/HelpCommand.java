@@ -41,7 +41,9 @@ public class HelpCommand implements SubCommand {
         List<String> keys = new ArrayList<>(configurationSection.getKeys(true));
         RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.help.header"));
         for (String key : keys) {
-            RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.help.command." + key));
+            if (commandSender.hasPermission("RegionReset." + key)) {
+                RegionReset.sendMessage(commandSender, RegionResetConfig.getText("info.help.command." + key));
+            }
         }
     }
 }
