@@ -3,6 +3,7 @@ package io.github.apfelcreme.RegionReset;
 import com.griefcraft.lwc.LWC;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.util.profile.Profile;
 import de.minebench.plotsigns.PlotSigns;
 import de.themoep.minedown.MineDown;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
@@ -47,9 +48,9 @@ import java.util.regex.Pattern;
 public class RegionReset extends JavaPlugin {
 
     /**
-     * a cache for name -> uuid. Just in case some player hammers /portal list [Name] or so
+     * a cache for uuid -> uuid
      */
-    private Map<String, UUID> uuidCache = null;
+    private Map<UUID, String> uuidCache = null;
 
     /**
      * directly store reference to UUIDDB plugin instead of always getting the instance
@@ -248,13 +249,15 @@ public class RegionReset extends JavaPlugin {
         String name = null;
         if (uuidDb != null) {
             name = uuidDb.getStorage().getNameByUUID(uuid);
-        } else if (uuidCache.containsValue(uuid)) {
-            for (Map.Entry<String, UUID> entry : uuidCache.entrySet()) {
-                if (entry.getValue().equals(uuid)) {
-                    name = entry.getKey();
-                    break;
-                }
+        }
+        if (name == null) {
+            Profile profile = worldGuard.getProfileCache().getIfPresent(uuid);
+            if (profile != null) {
+                name = profile.getName();
             }
+        }
+        if (name == null) {
+            name = uuidCache.get(uuid);
         }
 
         if (name == null) {
@@ -273,7 +276,7 @@ public class RegionReset extends JavaPlugin {
                 if (uuidDb != null) {
                     uuidDb.getStorage().insert(uuid, name);
                 } else {
-                    uuidCache.put(name, uuid);
+                    uuidCache.put(uuid, name);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
