@@ -5,6 +5,7 @@ import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.*;
@@ -51,7 +52,36 @@ public class CheckCommand implements SubCommand {
                     }
 
                     Integer pageSize = RegionReset.getInstance().getConfig().getInt("pageSize");
-                    Integer maxPages = (int) Math.ceil((float) blueprint.getRegions().size() / pageSize);
+                    Map<ProtectedRegion, Long> inactiveRegions = new LinkedHashMap<>();
+                    for (int i = 0; i < blueprint.getRegions().size()
+                            && inactiveRegions.size() < (pageSize * page) + pageSize; i++) {
+                        ProtectedRegion region = blueprint.getRegions().get(i);
+                        long shortestOfflineTime = Long.MAX_VALUE;
+                        boolean atLeastOneActivePlayer = false;
+                        List<UUID> members = new ArrayList<>(region.getOwners().getUniqueIds());
+                        members.addAll(new ArrayList<>(region.getMembers().getUniqueIds()));
+                        for (UUID uuid : members) {
+                            long lastLogout = 0;
+                            OfflinePlayer player = RegionReset.getInstance().getServer().getOfflinePlayer(uuid);
+                            if (player != null) {
+                                lastLogout = player.getLastPlayed();
+                            }
+                            long offlineTime = new Date().getTime() - lastLogout;
+                            if (offlineTime < RegionReset.getInstance().getConfig().getLong("resetLimit") * MSPERDAY) {
+                                atLeastOneActivePlayer = true;
+                                break;
+                            } else if (offlineTime < shortestOfflineTime) {
+                                shortestOfflineTime = offlineTime;
+                            }
+                        }
+    
+                        //add to inactive map
+                        if (!members.isEmpty() && !atLeastOneActivePlayer) {
+                            inactiveRegions.put(region, shortestOfflineTime);
+                        }
+                    }
+                    
+                    Integer maxPages = (int) Math.ceil((float) inactiveRegions.size() / pageSize);
                     if (page >= maxPages - 1) {
                         page = maxPages - 1;
                     }
@@ -60,34 +90,16 @@ public class CheckCommand implements SubCommand {
                             "reset-limit", Integer.toString(RegionReset.getInstance().getConfig().getInt("resetLimit")),
                             "page", Integer.toString(page + 1),
                             "last-page", maxPages.toString());
-                    for (int i = page * pageSize; i < (page * pageSize) + pageSize; i++) {
-                        if (i < blueprint.getRegions().size() && blueprint.getRegions().size() > 0) {
-                            boolean atLeastOneActivePlayer = false;
-                            ProtectedRegion region = blueprint.getRegions().get(i);
-                            List<UUID> members = new ArrayList<>(region.getOwners().getUniqueIds());
-                            members.addAll(new ArrayList<>(region.getMembers().getUniqueIds()));
-                            for (UUID uuid : members) {
-                                long lastLogout = 0;
-                                if (RegionReset.getInstance().getServer().getOfflinePlayer(uuid) != null) {
-                                    lastLogout = RegionReset.getInstance().getServer().getOfflinePlayer(uuid).getLastPlayed();
-                                }
-                                Long offlineTime = new Date().getTime() - lastLogout;
-                                if (offlineTime < RegionReset.getInstance().getConfig().getLong("resetLimit") * MSPERDAY) {
-                                    atLeastOneActivePlayer = true;
-                                }
-                            }
-
-                            //print the results
-                            if (!members.isEmpty() && !atLeastOneActivePlayer) {
-                                RegionReset.sendConfigMessage(commandSender, "info.check.element",
-                                        "region", region.getId(),
-                                        "region", region.getId(),
-                                        "owners", region.getOwners().getPlayers().stream().collect(Collectors.joining(", ")),
-                                        "members", region.getMembers().getPlayers().stream().collect(Collectors.joining(", "))
-                                );
-                            }
-                        }
-                    }
+                    inactiveRegions.entrySet().stream().skip(page * pageSize).limit(pageSize).forEachOrdered(e -> {
+                        ProtectedRegion region = e.getKey();
+                        RegionReset.sendConfigMessage(commandSender, "info.check.element",
+                                "region", region.getId(),
+                                "region", region.getId(),
+                                "offlinetime", RegionReset.formatTimeDifference(e.getValue()),
+                                "owners", region.getOwners().toUserFriendlyString(RegionReset.getInstance().getWorldGuard().getProfileCache()),
+                                "members", region.getMembers().toUserFriendlyString(RegionReset.getInstance().getWorldGuard().getProfileCache())
+                        );
+                    });
                     RegionReset.sendConfigMessage(commandSender, "info.check.footer", "blueprint", blueprint.getName());
                 } else {
                     RegionReset.sendMessage(commandSender, RegionResetConfig.getText("error.unknownBlueprint")
