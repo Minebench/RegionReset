@@ -1,6 +1,6 @@
 package io.github.apfelcreme.RegionReset.Exceptions;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.regions.Region;
 
 /**
  * Plugin zum Reset von WorldGuard-Regionen mit einer Standard-Region
@@ -24,9 +24,9 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
  */
 public class NonCuboidSelectionException extends Throwable {
 
-    private Selection selection;
+    private Region selection;
 
-    public NonCuboidSelectionException(Selection selection) {
+    public NonCuboidSelectionException(Region selection) {
         this.selection = selection;
     }
 
@@ -35,7 +35,7 @@ public class NonCuboidSelectionException extends Throwable {
      *
      * @return the selection
      */
-    public Selection getSelection() {
+    public Region getSelection() {
         return selection;
     }
 }

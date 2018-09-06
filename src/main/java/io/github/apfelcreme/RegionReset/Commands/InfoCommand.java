@@ -1,5 +1,7 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
@@ -65,36 +67,41 @@ public class InfoCommand implements SubCommand {
                             .replace("{0}", "/rr info <Region> <World>"));
                     return;
                 }
-                
-                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(regionName);
-                if (region != null) {
-                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(world, region);
-                    if (blueprint != null) {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("info.info.info")
-                                .replace("{0}", regionName)
-                                .replace("{1}", blueprint.getName()));
-                        List<UUID> members = new ArrayList<>(region.getOwners().getUniqueIds());
-                        members.addAll(new ArrayList<>(region.getMembers().getUniqueIds()));
-                        for (UUID uuid : members) {
-                            long lastLogout = 0;
-                            OfflinePlayer member = RegionReset.getInstance().getServer().getOfflinePlayer(uuid);
-                            if (member != null && member.hasPlayedBefore()) {
-                                lastLogout = member.getLastPlayed();
+                com.sk89q.worldguard.protection.managers.RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(world));
+                if (rm != null) {
+                    ProtectedRegion region = rm.getRegion(strings[1]);
+                    if (region != null) {
+                        Blueprint blueprint = RegionManager.getInstance().getBlueprint(world, region);
+                        if (blueprint != null) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.info.info")
+                                    .replace("{0}", regionName)
+                                    .replace("{1}", blueprint.getName()));
+                            List<UUID> members = new ArrayList<>(region.getOwners().getUniqueIds());
+                            members.addAll(new ArrayList<>(region.getMembers().getUniqueIds()));
+                            for (UUID uuid : members) {
+                                long lastLogout = 0;
+                                OfflinePlayer member = RegionReset.getInstance().getServer().getOfflinePlayer(uuid);
+                                if (member != null && member.hasPlayedBefore()) {
+                                    lastLogout = member.getLastPlayed();
+                                }
+                                String offlineTime = RegionReset.formatTimeDifference(new Date().getTime() - lastLogout);
+                                String name = RegionReset.getInstance().getNameByUUID(uuid);
+                                if (name != null) {
+                                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.info.member")
+                                            .replace("{0}", name)
+                                            .replace("{1}", offlineTime));
+                                }
                             }
-                            String offlineTime = RegionReset.formatTimeDifference(new Date().getTime() - lastLogout);
-                            String name = RegionReset.getInstance().getNameByUUID(uuid);
-                            if (name != null) {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.info.member")
-                                        .replace("{0}", name)
-                                        .replace("{1}", offlineTime));
-                            }
+                        } else {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));
                         }
                     } else {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
+                                .replace("{0}", regionName));
                     }
                 } else {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
-                            .replace("{0}", regionName));
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noRegionContainer")
+                            .replace("{0}", world.getName()));
                 }
             } else {
                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")

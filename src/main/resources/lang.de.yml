@@ -4,10 +4,12 @@ texts:
     chunkNotLoaded: '&c Der Chunk, in welcher die Region liegt, ist nicht geladen!'
     differentSize: '&c Die Region {0} und der Blueprint {1} haben nicht die gleiche Größe!'
     duplicateBlueprintName: '&c Es existiert bereits ein Blueprint mit dem Namen {0}!'
+    incompleteSelection: '&c Bitte vervollständige diene Auswahl!!'
     noBackupFound: '&c Für die Region {0} wurde kein Backup gefunden!'
     noCuboidRegion: '&c Die gewählte Region muss vom Typ CUBOID sein!'
     noCuboidSelection: '&c Die getroffene Auswahl muss vom Typ CUBOID sein!'
     noPermission: '&c Du hast keine ausreichende Berechtigung!'
+    noRegionContainer: '&c The world {0} is not enabled in WorldGuard!'
     noSelection: '&c Du hast noch keine Auswahl mit WorldEdit getroffen!'
     regionNotAssigned: '&c Die Region wurde keinem Blueprint zugeordnet!'
     unknownBlueprint: '&c Der Blueprint {0} existiert nicht!'
@@ -25,17 +27,17 @@ texts:
       worldHeader: '&2 {0}&8:'
       element: '&7 - {0} &8[{1} Regionen]'
     check:
-      header: '&a Alle Regionen des Blueprints &2{blueprint}&a, deren Eigner seit &2{reset-limit}&a Tagen offline sind: &2(&a{page]&2/&a{last-page}&2)'
-      element: '&8 - &2[{region}](hover=&2Name: &f{region}\n&2Besitzer:&f {owners}\n&2Mitglieder:&f {members}): &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
-      footer: '&a Für andere Seiten: [&2/rr check <Blueprint> <#>](suggest_command=/rr check {blueprint})'
+      header: '&a Alle Regionen des Blueprints &2{blueprint}&a, deren Eigner seit &2{reset-limit}&a Tagen offline sind: &2(&a{page}&2/&a{last-page}&2)'
+      element: "&8 - &2[{region}](hover=&2Name: &f{region}\n&2Besitzer:&f {owners}\n&2Offline: &f{offlinetime}\n&2Mitglieder:&f {members}): [&a&otp](/rg tp {region}) [&a&oinfo](/rg info {region}) [&c&oreset](suggest_command=/rr reset {region})"
+      footer: '&a Für andere Seiten: [&2/rr check <Blueprint> <#>](suggest_command={/rr check {blueprint} })'
     checkDetail:
       header: '&a Alle Regionen des Blueprints &2{blueprint}&a, deren Eigner seit &2{reset-limit}&a Tagen offline sind: &2(&a{page]&2/&a{last-page}&2)'
       member: '&8   - &7{player}: &8{offline-time}'
       name: '&2{0} &8{1}'
-      region1: '&8 - &2{region}: &aBereit zum Reset &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
-      region2: '&8 - &2{region}: &cNicht bereit zum Reset &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
-      region3: '&8 - &2{region}: &7Keine Owner/Member &a&o[tp](/rg tp {region}) [info](/rg info {region}) &2&0[reset](/rr reset {region})'
-      footer: '&a Für andere Seiten: [&2/rr checkdetail <Blueprint> <#>](suggest_command=/rr checkdetail {blueprint})'
+      region1: '&8 - &2{region}: &aBereit zum Reset [&a&otp](/rg tp {region}) [&a&oinfo](/rg info {region}) [&c&oreset](suggest_command=/rr reset {region})'
+      region2: '&8 - &2{region}: &cNicht bereit zum Reset [&a&otp](/rg tp {region}) [&a&oinfo](/rg info {region}) [&c&oreset](suggest_command=/rr reset {region})'
+      region3: '&8 - &2{region}: &7Keine Owner/Member [&a&otp](/rg tp {region}) [&a&oinfo](/rg info {region}) [&c&oreset](suggest_command=/rr reset {region})'
+      footer: '&a Für andere Seiten: [&2/rr checkdetail <Blueprint> <#>](suggest_command={/rr checkdetail {blueprint} })'
     define:
       defined: '&a Du hast den Blueprint &2{0}&a erfolgreich definiert'
     delete:
@@ -45,8 +47,8 @@ texts:
       command:
         add: '&8 - &2add <Region> <Blueprint>: &aWeist eine Region einem BP zu'
         blueprints: '&8 - &2blueprints: &aZeigt eine Liste aller Blueprints'
-        check: '&8 - &2check <Blueprint>: &aZeigt Regionen & Status eines BPs'
-        checkdetail: '&8 - &2checkdetail <Blueprint>: &aZeigt detailierten Check'
+        check: '&8 - &2check <Blueprint>: &aZeigt Regionen und Status eines BPs'
+        checkDetail: '&8 - &2checkdetail <Blueprint>: &aZeigt detailierten Check'
         define: '&8 - &2define <Name>: &aDefiniert einen neuen Blueprint'
         delete: '&8 - &2delete <Blueprint>: &a Löscht ein Blueprint'
         help: '&8 - &2help: &aZeigt die Liste aller Commands'

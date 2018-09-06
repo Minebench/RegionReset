@@ -1,6 +1,11 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.NonCuboidSelectionException;
 import io.github.apfelcreme.RegionReset.Exceptions.UnknownException;
@@ -41,7 +46,13 @@ public class DefineCommand implements SubCommand {
     public void execute(CommandSender commandSender, String[] strings) {
         Player sender = (Player) commandSender;
         if (sender.hasPermission("RegionReset.define")) {
-            Selection selection = RegionReset.getInstance().getWorldEdit().getSelection(sender);
+            Region selection;
+            try {
+                selection = WorldEdit.getInstance().getSessionManager().get(WorldGuardPlugin.inst().wrapPlayer(sender)).getSelection(new BukkitWorld(sender.getWorld()));
+            } catch (IncompleteRegionException e) {
+                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.incompleteSelection"));
+                return;
+            }
             if (selection != null) {
                 if (strings.length > 1) {
                     String blueprintName = strings[1];

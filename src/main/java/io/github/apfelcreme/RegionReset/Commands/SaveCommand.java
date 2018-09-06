@@ -1,5 +1,7 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
@@ -62,28 +64,34 @@ public class SaveCommand implements SubCommand {
                             .replace("{0}", "/rr save <Region> <World>"));
                     return;
                 }
-                
-                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(regionName);
-                if (region != null) {
-                    try {
-                        RegionManager.getInstance().saveRegion(sender, region, world);
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("info.save.saved")
+
+                com.sk89q.worldguard.protection.managers.RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(world));
+                if (rm != null) {
+                    ProtectedRegion region = rm.getRegion(strings[1]);
+                    if (region != null) {
+                        try {
+                            RegionManager.getInstance().saveRegion(sender, region, world);
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.save.saved")
+                                    .replace("{0}", regionName));
+                            RegionReset.getInstance().getLogger()
+                                    .info("Region '" + region.getId() + "' in World '" + sender.getName()
+                                            + "' has been saved by '" + sender.getName() + "'");
+                        } catch (UnknownException e) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")
+                                    .replace("{0}", e.getException().getClass().getName()));
+                            e.printStackTrace();
+                        } catch (NonCuboidRegionException e) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noCuboidRegion"));
+                        } catch (ChunkNotLoadedException e) {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
+                        }
+                    } else {
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
                                 .replace("{0}", regionName));
-                        RegionReset.getInstance().getLogger()
-                                .info("Region '" + region.getId() + "' in World '" + sender.getName()
-                                        + "' has been saved by '" + sender.getName() + "'");
-                    } catch (UnknownException e) {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")
-                                .replace("{0}", e.getException().getClass().getName()));
-                        e.printStackTrace();
-                    } catch (NonCuboidRegionException e) {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noCuboidRegion"));
-                    } catch (ChunkNotLoadedException e) {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
                     }
                 } else {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
-                            .replace("{0}", regionName));
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noRegionContainer")
+                            .replace("{0}", world.getName()));
                 }
             } else {
                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")

@@ -1,11 +1,16 @@
 package io.github.apfelcreme.RegionReset.Listener;
 
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -45,17 +50,20 @@ public class ItemRightclickListener implements Listener {
             return;
         }
 
-        WorldConfiguration wConf = RegionReset.getInstance().getWorldGuard().getGlobalStateManager().get(event.getClickedBlock().getWorld());
-        if (event.getItem() != null && event.getItem().getType().getId() == wConf.regionWand) {
-            Set<ProtectedRegion> regions = RegionReset.getInstance().getWorldGuard()
-                    .getRegionManager(event.getClickedBlock().getWorld())
-                    .getApplicableRegions(event.getClickedBlock().getLocation()).getRegions();
-            for (ProtectedRegion region : regions) {
-                Blueprint blueprint = RegionManager.getInstance().getBlueprint(event.getPlayer().getWorld(), region);
-                if (blueprint != null) {
-                    event.getPlayer().sendMessage(RegionResetConfig.getText("info.rightClick")
-                            .replace("{0}", region.getId())
-                            .replace("{1}", blueprint.getName()));
+        World world = new BukkitWorld(event.getClickedBlock().getWorld());
+        BukkitWorldConfiguration wConf = (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
+        if (event.getItem() != null && event.getItem().getType().getKey().toString().equals(wConf.regionWand)) {
+            com.sk89q.worldguard.protection.managers.RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
+            if (rm != null) {
+                Location l = event.getClickedBlock().getLocation();
+                Set<ProtectedRegion> regions = rm.getApplicableRegions(new Vector(l.getX(), l.getY(), l.getZ())).getRegions();
+                for (ProtectedRegion region : regions) {
+                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(event.getPlayer().getWorld(), region);
+                    if (blueprint != null) {
+                        event.getPlayer().sendMessage(RegionResetConfig.getText("info.rightClick")
+                                .replace("{0}", region.getId())
+                                .replace("{1}", blueprint.getName()));
+                    }
                 }
             }
         }

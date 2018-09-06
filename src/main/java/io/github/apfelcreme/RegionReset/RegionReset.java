@@ -63,16 +63,6 @@ public class RegionReset extends JavaPlugin {
     private static RegionReset instance = null;
 
     /**
-     * the worldedit plugin instance
-     */
-    private WorldEditPlugin worldEdit = null;
-
-    /**
-     * the worldguard plugin instance
-     */
-    private WorldGuardPlugin worldGuard = null;
-
-    /**
      * PlotSigns plugin instance
      */
     private PlotSigns plotSigns = null;
@@ -104,21 +94,6 @@ public class RegionReset extends JavaPlugin {
             saveDefaultConfig();
         }
 
-        // check for WorldGuard & WorldEdit
-        worldEdit = (WorldEditPlugin) getServer().getPluginManager()
-                .getPlugin("WorldEdit");
-        if (worldEdit == null) {
-            getLogger().severe("Plugin WorldEdit wasn't found!");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        worldGuard = (WorldGuardPlugin) getServer().getPluginManager()
-                .getPlugin("WorldGuard");
-        if (worldGuard == null) {
-            getLogger().severe("Plugin WorldGuard wasn't found!");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
         if (getServer().getPluginManager().isPluginEnabled("PlotSigns")) {
             plotSigns = (PlotSigns) getServer().getPluginManager().getPlugin("PlotSigns");
             getLogger().info("Plugin PlotSigns found!");
@@ -188,24 +163,6 @@ public class RegionReset extends JavaPlugin {
     }
 
     /**
-     * returns the worldedit plugin instance
-     *
-     * @return the worldedit plugin instance
-     */
-    public WorldEditPlugin getWorldEdit() {
-        return worldEdit;
-    }
-
-    /**
-     * returns the worldguard plugin instance
-     *
-     * @return the worldguard plugin instance
-     */
-    public WorldGuardPlugin getWorldGuard() {
-        return worldGuard;
-    }
-
-    /**
      * returns the PlotSigns plugin instance
      * @return the PlotSigns plugin instance
      */
@@ -251,7 +208,7 @@ public class RegionReset extends JavaPlugin {
             name = uuidDb.getStorage().getNameByUUID(uuid);
         }
         if (name == null) {
-            Profile profile = worldGuard.getProfileCache().getIfPresent(uuid);
+            Profile profile = WorldGuardPlugin.inst().getProfileCache().getIfPresent(uuid);
             if (profile != null) {
                 name = profile.getName();
             }

@@ -5,13 +5,12 @@ import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldedit.data.DataException;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.schematic.SchematicFormat;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldedit.world.DataException;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import de.minebench.plotsigns.PlotSigns;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
@@ -23,7 +22,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +65,7 @@ public class SchematicUtils {
     public static void pasteBlueprint(File schematicFile, boolean noAir, ProtectedRegion region, World world)
             throws DifferentRegionSizeException, ChunkNotLoadedException, MaxChangedBlocksException {
         try {
-            EditSession editSession = new EditSession(new BukkitWorld(world), Integer.MAX_VALUE);
+            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), Integer.MAX_VALUE);
             SchematicFormat schematic = SchematicFormat.getFormat(schematicFile);
             CuboidClipboard clipboard = schematic.load(schematicFile);
 
@@ -182,10 +180,12 @@ public class SchematicUtils {
                 region.getMaximumPoint().getBlockX(), region.getMaximumPoint().getBlockZ());
     }
     
-    private static void loadChunks(Selection selection) throws ChunkNotLoadedException {
-        loadChunks(selection.getWorld(),
-                selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockZ(),
-                selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockZ());
+    private static void loadChunks(Region selection) throws ChunkNotLoadedException {
+        if (selection.getWorld() != null) {
+            loadChunks(((BukkitWorld) selection.getWorld()).getWorld(),
+                    selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockZ(),
+                    selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockZ());
+        }
     }
 
     /**
@@ -197,7 +197,7 @@ public class SchematicUtils {
      * @throws DataException
      * @throws ChunkNotLoadedException
      */
-    public static void saveBlueprintSchematic(Blueprint blueprint, Selection selection)
+    public static void saveBlueprintSchematic(Blueprint blueprint, Region selection)
             throws IOException, DataException, ChunkNotLoadedException {
 
         if (selection == null || selection.getWorld() == null) {
@@ -210,12 +210,12 @@ public class SchematicUtils {
         loadChunks(selection);
         
         // save the schematic
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(selection.getWorld()), -1);
+        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(selection.getWorld(), -1);
         CuboidClipboard clipboard = new CuboidClipboard(
-                selection.getNativeMaximumPoint()
-                        .subtract(selection.getNativeMinimumPoint())
+                selection.getMaximumPoint()
+                        .subtract(selection.getMinimumPoint())
                         .add(1, 1, 1),
-                selection.getNativeMinimumPoint()
+                selection.getMinimumPoint()
         );
         clipboard.copy(editSession);
 
@@ -240,7 +240,7 @@ public class SchematicUtils {
         for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
             for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
                 for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
-                    if (world.getBlockAt(x, y, z).getType() == Material.SIGN_POST
+                    if (world.getBlockAt(x, y, z).getType() == Material.SIGN
                             || world.getBlockAt(x, y, z).getType() == Material.WALL_SIGN) {
                         Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
                         if (tempSign.getLines()[0].equals(signSellLine)) {
@@ -252,9 +252,9 @@ public class SchematicUtils {
         }
         if (signs.size() > 0) {
             Bukkit.getScheduler().runTask(RegionReset.getInstance(), () -> {
-                if (region.getFlag(DefaultFlag.BUYABLE) != null && region.getFlag(DefaultFlag.PRICE) != null) {
+                if (region.getFlag(Flags.BUYABLE) != null && region.getFlag(Flags.PRICE) != null) {
                     PlotSigns plotSigns = RegionReset.getInstance().getPlotSigns();
-                    region.setFlag(DefaultFlag.BUYABLE, true);
+                    region.setFlag(Flags.BUYABLE, true);
                     String[] lines = plotSigns.getSignLines(region);
                     for (Sign sign : signs) {
                         for (int i = 0; i < lines.length; i++) {

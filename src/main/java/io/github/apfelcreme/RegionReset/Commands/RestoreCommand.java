@@ -1,5 +1,7 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
@@ -65,40 +67,46 @@ public class RestoreCommand implements SubCommand {
                             .replace("{0}", "/rr restore <Region> <World>"));
                     return;
                 }
-                
-                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(regionName);
-                if (region != null) {
-                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(world, region);
-                    if (blueprint != null) {
-                        if (blueprint.getBlueprintFile().exists()) {
-                            try {
-                                RegionManager.getInstance().restoreRegion(sender, region, world);
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.restore.restored")
-                                        .replace("{0}", regionName));
-                                RegionReset.getInstance().getLogger()
-                                        .info("Region '" + region.getId() + "' in World '" + world.getName()
-                                                + "' has been restored by " + sender.getName());
-                            } catch (UnknownException e) {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")
-                                        .replace("{0}", e.getException().getClass().getName()));
-                                e.printStackTrace();
-                            } catch (DifferentRegionSizeException e) {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.differentSize")
-                                        .replace("{0}", e.getRegionName())
-                                        .replace("{1}", e.getBlueprintName()));
-                            } catch (ChunkNotLoadedException e) {
-                                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
+
+                com.sk89q.worldguard.protection.managers.RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(world));
+                if (rm != null) {
+                    ProtectedRegion region = rm.getRegion(strings[1]);
+                    if (region != null) {
+                        Blueprint blueprint = RegionManager.getInstance().getBlueprint(world, region);
+                        if (blueprint != null) {
+                            if (blueprint.getBlueprintFile().exists()) {
+                                try {
+                                    RegionManager.getInstance().restoreRegion(sender, region, world);
+                                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.restore.restored")
+                                            .replace("{0}", regionName));
+                                    RegionReset.getInstance().getLogger()
+                                            .info("Region '" + region.getId() + "' in World '" + world.getName()
+                                                    + "' has been restored by " + sender.getName());
+                                } catch (UnknownException e) {
+                                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownException")
+                                            .replace("{0}", e.getException().getClass().getName()));
+                                    e.printStackTrace();
+                                } catch (DifferentRegionSizeException e) {
+                                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.differentSize")
+                                            .replace("{0}", e.getRegionName())
+                                            .replace("{1}", e.getBlueprintName()));
+                                } catch (ChunkNotLoadedException e) {
+                                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.chunkNotLoaded"));
+                                }
+                            } else {
+                                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noBackupFound")
+                                        .replace("{0}", blueprint.getBlueprintFile().getName()));
                             }
                         } else {
-                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noBackupFound")
-                                    .replace("{0}", blueprint.getBlueprintFile().getName()));
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));
                         }
                     } else {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
+                                .replace("{0}", regionName));
                     }
                 } else {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
-                            .replace("{0}", regionName));
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noRegionContainer")
+                            .replace("{0}", world.getName()));
                 }
             } else {
                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")

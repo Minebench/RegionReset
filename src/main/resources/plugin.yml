@@ -3,6 +3,7 @@ version: '${minecraft.plugin.version}'
 main: io.github.apfelcreme.RegionReset.RegionReset
 depend: [WorldGuard, WorldEdit]
 softdepend: [UUIDDB,PlotSigns,LWC]
+api-version: "1.13"
 
 commands:
    rr:

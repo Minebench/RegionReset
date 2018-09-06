@@ -1,5 +1,6 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
@@ -96,8 +97,8 @@ public class CheckCommand implements SubCommand {
                                 "region", region.getId(),
                                 "region", region.getId(),
                                 "offlinetime", RegionReset.formatTimeDifference(e.getValue()),
-                                "owners", region.getOwners().toUserFriendlyString(RegionReset.getInstance().getWorldGuard().getProfileCache()),
-                                "members", region.getMembers().toUserFriendlyString(RegionReset.getInstance().getWorldGuard().getProfileCache())
+                                "owners", region.getOwners().toUserFriendlyString(WorldGuardPlugin.inst().getProfileCache()),
+                                "members", region.getMembers().toUserFriendlyString(WorldGuardPlugin.inst().getProfileCache())
                         );
                     });
                     RegionReset.sendConfigMessage(commandSender, "info.check.footer", "blueprint", blueprint.getName());

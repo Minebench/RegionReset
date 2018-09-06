@@ -1,5 +1,7 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.Exceptions.MissingFileException;
@@ -64,30 +66,36 @@ public class AddCommand implements SubCommand {
                             .replace("{0}", "/rr add <Region> <Blueprint> <World>"));
                     return;
                 }
-                
-                ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(strings[1]);
-                if (region != null) {
-                    Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
-                    if (blueprint != null) {
-                        try {
-                            RegionManager.getInstance().addRegion(sender, region, blueprint, world);
-                            RegionReset.sendMessage(sender, RegionResetConfig.getText("info.add.added")
-                                    .replace("{0}", regionName));
-                            RegionReset.getInstance().getLogger()
-                                    .info("Region '" + region.getId() + "' in World '" + blueprint.getWorld().getName()
-                                            + "' has been added to the blueprint '"
-                                            + blueprint.getName() + "' by " + sender.getName());
-                        } catch (MissingFileException e) {
-                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprintFile")
-                                    .replace("{0}", blueprint.getName()).replace("{1}", e.getFile().getPath()));
+
+                com.sk89q.worldguard.protection.managers.RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(world));
+                if (rm != null) {
+                    ProtectedRegion region = rm.getRegion(strings[1]);
+                    if (region != null) {
+                        Blueprint blueprint = RegionManager.getInstance().getBlueprint(blueprintName);
+                        if (blueprint != null) {
+                            try {
+                                RegionManager.getInstance().addRegion(sender, region, blueprint, world);
+                                RegionReset.sendMessage(sender, RegionResetConfig.getText("info.add.added")
+                                        .replace("{0}", regionName));
+                                RegionReset.getInstance().getLogger()
+                                        .info("Region '" + region.getId() + "' in World '" + blueprint.getWorld().getName()
+                                                + "' has been added to the blueprint '"
+                                                + blueprint.getName() + "' by " + sender.getName());
+                            } catch (MissingFileException e) {
+                                RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprintFile")
+                                        .replace("{0}", blueprint.getName()).replace("{1}", e.getFile().getPath()));
+                            }
+                        } else {
+                            RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprint")
+                                    .replace("{0}", blueprintName));
                         }
                     } else {
-                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownBlueprint")
-                                .replace("{0}", blueprintName));
+                        RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
+                                .replace("{0}", regionName));
                     }
                 } else {
-                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownRegion")
-                            .replace("{0}", regionName));
+                    RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noRegionContainer")
+                            .replace("{0}", world.getName()));
                 }
             } else {
                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.wrongUsage")

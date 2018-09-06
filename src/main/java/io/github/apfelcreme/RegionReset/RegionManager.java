@@ -2,9 +2,12 @@ package io.github.apfelcreme.RegionReset;
 
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldedit.data.DataException;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.DataException;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
@@ -108,9 +111,12 @@ public class RegionManager {
                     File blueprintFile = new File(plugin.getDataFolder() + "/blueprints/"
                             + world.getName() + "/" + blueprintName + ".schematic");
                     for (String regionName : regionNames) {
-                        ProtectedRegion region = RegionReset.getInstance().getWorldGuard().getRegionManager(world).getRegion(regionName);
-                        if (region != null) {
-                            blueprintRegions.add(region);
+                        com.sk89q.worldguard.protection.managers.RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(world));
+                        if (rm != null) {
+                            ProtectedRegion region = rm.getRegion(regionName);
+                            if (region != null) {
+                                blueprintRegions.add(region);
+                            }
                         }
                     }
                     blueprints.add(new Blueprint(blueprintName, world, blueprintFile, blueprintRegions));
@@ -253,7 +259,10 @@ public class RegionManager {
                         SchematicUtils.removeProtections(sender, region, world);
                         region.getOwners().removeAll();
                         region.getMembers().removeAll();
-                        plugin.getWorldGuard().getRegionManager(world).save();
+                        com.sk89q.worldguard.protection.managers.RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(world));
+                        if (rm != null) {
+                            rm.saveChanges();
+                        }
                         plugin.getLogger().info("Region '" + region.getId() + "' in World '" + world.getName()
                                 + "' has been reset by " + sender.getName());
                         return backupFile;
@@ -316,7 +325,7 @@ public class RegionManager {
      * @throws UnknownException            something else happened
      * @throws ChunkNotLoadedException
      */
-    public void defineBlueprint(Player sender, Selection selection, String blueprintName)
+    public void defineBlueprint(Player sender, Region selection, String blueprintName)
             throws NonCuboidSelectionException, UnknownException, ChunkNotLoadedException {
         if (!blueprintName.endsWith(".schematic")) {
             blueprintName += ".schematic";
@@ -325,7 +334,7 @@ public class RegionManager {
                 .getDataFolder() + "/blueprints/" + sender.getWorld().getName() + "/" + blueprintName);
         Blueprint blueprint = new Blueprint(blueprintName.replace(".schematic", ""), sender.getWorld(), blueprintFile);
         try {
-            if (selection instanceof CuboidSelection) {
+            if (selection instanceof CuboidRegion) {
                 SchematicUtils.saveBlueprintSchematic(blueprint, selection);
 
                 if (blueprintConfig.getConfigurationSection(sender.getWorld().getName()) == null) {
