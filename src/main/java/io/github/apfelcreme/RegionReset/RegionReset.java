@@ -1,9 +1,8 @@
 package io.github.apfelcreme.RegionReset;
 
 import com.griefcraft.lwc.LWC;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.squirrelid.Profile;
+import com.sk89q.worldguard.WorldGuard;
 import de.minebench.plotsigns.PlotSigns;
 import de.themoep.minedown.MineDown;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
@@ -208,7 +207,7 @@ public class RegionReset extends JavaPlugin {
             name = uuidDb.getStorage().getNameByUUID(uuid);
         }
         if (name == null) {
-            Profile profile = WorldGuardPlugin.inst().getProfileCache().getIfPresent(uuid);
+            Profile profile = WorldGuard.getInstance().getProfileCache().getIfPresent(uuid);
             if (profile != null) {
                 name = profile.getName();
             }

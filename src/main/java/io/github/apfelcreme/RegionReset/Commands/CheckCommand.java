@@ -1,6 +1,6 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
@@ -9,8 +9,12 @@ import io.github.apfelcreme.RegionReset.RegionResetConfig;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Copyright (C) 2016 Lord36 aka Apfelcreme
@@ -97,8 +101,8 @@ public class CheckCommand implements SubCommand {
                                 "region", region.getId(),
                                 "region", region.getId(),
                                 "offlinetime", RegionReset.formatTimeDifference(e.getValue()),
-                                "owners", region.getOwners().toUserFriendlyString(WorldGuardPlugin.inst().getProfileCache()),
-                                "members", region.getMembers().toUserFriendlyString(WorldGuardPlugin.inst().getProfileCache())
+                                "owners", region.getOwners().toUserFriendlyString(WorldGuard.getInstance().getProfileCache()),
+                                "members", region.getMembers().toUserFriendlyString(WorldGuard.getInstance().getProfileCache())
                         );
                     });
                     RegionReset.sendConfigMessage(commandSender, "info.check.footer", "blueprint", blueprint.getName());

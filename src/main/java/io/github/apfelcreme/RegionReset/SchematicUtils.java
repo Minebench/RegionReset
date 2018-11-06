@@ -1,14 +1,27 @@
 package io.github.apfelcreme.RegionReset;
 
 import com.griefcraft.lwc.LWC;
-import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.schematic.SchematicFormat;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -23,11 +36,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * Plugin zum Reset von WorldGuard-Regionen mit einer Standard-Region
@@ -64,24 +82,35 @@ public class SchematicUtils {
      */
     public static void pasteBlueprint(File schematicFile, boolean noAir, ProtectedRegion region, World world)
             throws DifferentRegionSizeException, ChunkNotLoadedException, MaxChangedBlocksException {
-        try {
-            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), Integer.MAX_VALUE);
-            SchematicFormat schematic = SchematicFormat.getFormat(schematicFile);
-            CuboidClipboard clipboard = schematic.load(schematicFile);
+        try (Closer closer = Closer.create()) {
+            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(world), Integer.MAX_VALUE);
+            ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
+            if (format == null) {
+                RegionReset.getInstance().getLogger().log(Level.SEVERE, "Could not determinate schematic format of file " + schematicFile.getPath());
+                return;
+            }
+            FileInputStream fis = closer.register(new FileInputStream(schematicFile));
+            BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
+            ClipboardReader reader = closer.register(format.getReader(bis));
+
+            Clipboard clipboard = reader.read();
 
             int length = Math.abs(region.getMaximumPoint().getBlockX() - region.getMinimumPoint().getBlockX()) + 1;
             int height = Math.abs(region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY()) + 1;
             int width = Math.abs(region.getMaximumPoint().getBlockZ() - region.getMinimumPoint().getBlockZ()) + 1;
 
-            if (width != clipboard.getSize().getBlockX() || height != clipboard.getSize().getBlockY() || length != clipboard.getSize().getBlockZ()) {
+            if (width != clipboard.getDimensions().getBlockX() || height != clipboard.getDimensions().getBlockY() || length != clipboard.getDimensions().getBlockZ()) {
                 throw new DifferentRegionSizeException(region.getId(), schematicFile.getName());
             }
             
             loadChunks(world, region);
 
-            clipboard.paste(editSession, region.getMinimumPoint(), noAir);
-            editSession.flushQueue();
-        } catch (DataException | IOException e) {
+            LocalSession session = new LocalSession();
+            session.setClipboard(new ClipboardHolder(clipboard));
+            Operation operation = session.getClipboard().createPaste(editSession).to(region.getMinimumPoint()).build();
+            Operations.complete(operation);
+            editSession.flushSession();
+        } catch (IOException | WorldEditException e) {
             e.printStackTrace();
         }
     }
@@ -95,11 +124,10 @@ public class SchematicUtils {
      * @param world         the world that the region is in
      * @throws IOException
      * @throws EmptyClipboardException
-     * @throws DataException
      * @throws ChunkNotLoadedException
      */
     public static void saveSchematic(File schematicFile, ProtectedRegion region, World world)
-            throws IOException, EmptyClipboardException, DataException, ChunkNotLoadedException {
+            throws IOException, WorldEditException, ChunkNotLoadedException {
 
         if (world == null) {
             return;
@@ -111,17 +139,14 @@ public class SchematicUtils {
         loadChunks(world, region);
         
         // save the schematic
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), -1);
-        CuboidClipboard clipboard = new CuboidClipboard(
+        CuboidRegion cuboidRegion = new CuboidRegion(
+                BukkitAdapter.adapt(world),
+                region.getMinimumPoint(),
                 region.getMaximumPoint()
                         .subtract(region.getMinimumPoint())
-                        .add(1, 1, 1),
-                region.getMinimumPoint()
+                        .add(1, 1, 1)
         );
-        clipboard.copy(editSession);
-
-        SchematicFormat.MCEDIT.save(clipboard, schematicFile);
-
+        writeToSchematic(schematicFile, cuboidRegion);
 
         // save a .yml with members and owners in it
         File informationFile = new File(schematicFile.getAbsolutePath().replace(".schematic", ".yml"));
@@ -150,7 +175,7 @@ public class SchematicUtils {
         config.save(informationFile);
 
     }
-    
+
     /**
      * Load all chunks
      *
@@ -182,7 +207,7 @@ public class SchematicUtils {
     
     private static void loadChunks(Region selection) throws ChunkNotLoadedException {
         if (selection.getWorld() != null) {
-            loadChunks(((BukkitWorld) selection.getWorld()).getWorld(),
+            loadChunks(BukkitAdapter.adapt(selection.getWorld()),
                     selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockZ(),
                     selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockZ());
         }
@@ -194,11 +219,10 @@ public class SchematicUtils {
      * @param blueprint the blueprint that shall be saved
      * @param selection the selection
      * @throws IOException
-     * @throws DataException
      * @throws ChunkNotLoadedException
      */
     public static void saveBlueprintSchematic(Blueprint blueprint, Region selection)
-            throws IOException, DataException, ChunkNotLoadedException {
+            throws IOException, ChunkNotLoadedException, WorldEditException {
 
         if (selection == null || selection.getWorld() == null) {
             return;
@@ -208,18 +232,32 @@ public class SchematicUtils {
         }
 
         loadChunks(selection);
-        
-        // save the schematic
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(selection.getWorld(), -1);
-        CuboidClipboard clipboard = new CuboidClipboard(
-                selection.getMaximumPoint()
-                        .subtract(selection.getMinimumPoint())
-                        .add(1, 1, 1),
-                selection.getMinimumPoint()
-        );
-        clipboard.copy(editSession);
 
-        SchematicFormat.MCEDIT.save(clipboard, blueprint.getBlueprintFile());
+        writeToSchematic(blueprint.getBlueprintFile(), selection);
+    }
+
+    private static void writeToSchematic(File schematicFile, Region cuboidRegion) throws WorldEditException, IOException {
+        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(cuboidRegion.getWorld(), -1);
+        BlockArrayClipboard clipboard = new BlockArrayClipboard(cuboidRegion);
+        clipboard.setOrigin(cuboidRegion.getMinimumPoint());
+        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, cuboidRegion, clipboard, cuboidRegion.getMinimumPoint());
+
+        Operations.complete(copy);
+
+        try (Closer closer = Closer.create()) {
+            // Create parent directories
+            File parent = schematicFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                if (!parent.mkdirs()) {
+                    throw new IOException("Could not create folder for schematics!");
+                }
+            }
+
+            FileOutputStream fos = closer.register(new FileOutputStream(schematicFile));
+            BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
+            ClipboardWriter writer = closer.register(BuiltInClipboardFormat.MCEDIT_SCHEMATIC.getWriter(bos));
+            writer.write(clipboard);
+        }
     }
     
     /**

@@ -1,13 +1,11 @@
 package io.github.apfelcreme.RegionReset;
 
-import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
@@ -276,7 +274,7 @@ public class RegionManager {
             } else {
                 throw new MissingFileException(blueprint.getBlueprintFile());
             }
-        } catch (DataException | EmptyClipboardException | StorageException | MaxChangedBlocksException e) {
+        } catch (WorldEditException | StorageException e) {
             // MaxChangedBlocksException shouldn't be happening as the EditSession can paste Integer.MAX_VALUE
             throw new UnknownException(e);
         } catch (IOException e) {
@@ -304,7 +302,7 @@ public class RegionManager {
             if (region.getType() == RegionType.CUBOID) {
                 try {
                     SchematicUtils.saveSchematic(saveFile, region, world);
-                } catch (EmptyClipboardException | DataException e) {
+                } catch (WorldEditException e) {
                     throw new UnknownException(e);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -352,7 +350,7 @@ public class RegionManager {
             } else {
                 throw new NonCuboidSelectionException(selection);
             }
-        } catch (DataException e) {
+        } catch (WorldEditException e) {
             throw new UnknownException(e);
         } catch (IOException e) {
             e.printStackTrace();
