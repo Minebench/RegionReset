@@ -189,7 +189,7 @@ public class SchematicUtils {
     private static void loadChunks(World world, int minX, int minZ, int maxX, int maxZ) throws ChunkNotLoadedException {
         // Check if chunks are loaded
         for (int x = minX >> 4; x <= maxX >> 4; x++) {
-            for (int z = minZ >> 4; z < maxZ >> 4; z++) {
+            for (int z = minZ >> 4; z <= maxZ >> 4; z++) {
                 if (!world.isChunkLoaded(x, z)) {
                     if (!world.loadChunk(x, z, false)) {
                         throw new ChunkNotLoadedException();
