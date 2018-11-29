@@ -75,7 +75,7 @@
     <repositories>
         <repository>
             <id>paper-repo</id>
-            <url>https://destroystokyo.com/repo/</url>
+            <url>https://repo.destroystokyo.com/repository/maven-public/</url>
         </repository>
         <repository>
             <id>md_5-repo</id>
