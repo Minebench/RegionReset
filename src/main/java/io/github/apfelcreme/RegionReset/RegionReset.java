@@ -1,8 +1,8 @@
 package io.github.apfelcreme.RegionReset;
 
 import com.griefcraft.lwc.LWC;
-import com.sk89q.squirrelid.Profile;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.util.profile.Profile;
 import de.minebench.plotsigns.PlotSigns;
 import de.themoep.minedown.MineDown;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
