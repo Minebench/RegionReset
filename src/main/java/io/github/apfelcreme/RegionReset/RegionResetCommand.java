@@ -95,11 +95,7 @@ public class RegionResetCommand implements CommandExecutor {
             subCommand = new HelpCommand();
         }
         if (subCommand != null) {
-            final SubCommand finalSubCommand = subCommand;
-
-            // execute the subcommand in a thread
-            RegionReset.getInstance().getServer().getScheduler().runTaskAsynchronously(
-                    RegionReset.getInstance(), () -> finalSubCommand.execute(sender, args));
+            subCommand.execute(sender, args);
         }
         return true;
     }
