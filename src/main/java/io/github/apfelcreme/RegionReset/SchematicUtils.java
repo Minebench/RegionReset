@@ -255,7 +255,7 @@ public class SchematicUtils {
 
             FileOutputStream fos = closer.register(new FileOutputStream(schematicFile));
             BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
-            ClipboardWriter writer = closer.register(BuiltInClipboardFormat.MCEDIT_SCHEMATIC.getWriter(bos));
+            ClipboardWriter writer = closer.register(BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(bos));
             writer.write(clipboard);
         }
     }

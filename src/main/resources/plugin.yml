@@ -6,9 +6,10 @@ softdepend: [UUIDDB,PlotSigns,LWC]
 api-version: "1.13"
 
 commands:
-   rr:
+   regionreset:
       description: Ersetzt die angegebene Region mit einem definierten blueprint.
-      usage:
+      aliases: [rr]
+      usage: /<command>
       permission:
       permission-message:
 permissions: 
