@@ -86,6 +86,9 @@
             <url>http://repo.minebench.de/</url>
         </repository>
         <repository>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
             <id>lwc-repo</id>
             <url>http://repo.dmulloy2.net/nexus/repository/snapshots/</url>
         </repository>
