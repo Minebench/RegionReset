@@ -22,8 +22,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.io.Closer;
-import com.sk89q.worldedit.world.DataException;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import de.minebench.plotsigns.PlotSigns;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
@@ -67,7 +65,6 @@ import java.util.logging.Level;
  *
  * @author Lord36 aka Apfelcreme
  */
-@SuppressWarnings("deprecation")
 public class SchematicUtils {
 
     /**
@@ -290,9 +287,9 @@ public class SchematicUtils {
         }
         if (signs.size() > 0) {
             Bukkit.getScheduler().runTask(RegionReset.getInstance(), () -> {
-                if (region.getFlag(Flags.BUYABLE) != null && region.getFlag(Flags.PRICE) != null) {
+                if (RegionReset.getInstance().getPlotSigns() != null && region.getFlag(PlotSigns.BUYABLE_FLAG) != null && region.getFlag(PlotSigns.PRICE_FLAG) != null) {
                     PlotSigns plotSigns = RegionReset.getInstance().getPlotSigns();
-                    region.setFlag(Flags.BUYABLE, true);
+                    region.setFlag(PlotSigns.BUYABLE_FLAG, true);
                     String[] lines = plotSigns.getSignLines(region);
                     for (Sign sign : signs) {
                         for (int i = 0; i < lines.length; i++) {
