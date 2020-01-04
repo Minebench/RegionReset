@@ -29,7 +29,10 @@ import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -275,8 +278,9 @@ public class SchematicUtils {
         for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
             for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
                 for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
-                    if (world.getBlockAt(x, y, z).getType() == Material.SIGN
-                            || world.getBlockAt(x, y, z).getType() == Material.WALL_SIGN) {
+                    Block block = world.getBlockAt(x, y, z);
+                    BlockData data = block.getBlockData();
+                    if (data instanceof org.bukkit.block.data.type.Sign || data instanceof WallSign) {
                         Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
                         if (tempSign.getLines()[0].equals(signSellLine)) {
                             signs.add(tempSign);
