@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.apfelcreme.RegionReset</groupId>
     <artifactId>RegionReset</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <build.number>${buildNumber}</build.number>
@@ -79,25 +79,29 @@
         </repository>
         <repository>
             <id>sk89q-repo</id>
-            <url>http://maven.sk89q.com/repo/</url>
+            <url>https://maven.sk89q.com/repo/</url>
         </repository>
         <repository>
             <id>minebench-repo</id>
-            <url>http://repo.minebench.de/</url>
+            <url>https://repo.minebench.de/</url>
+        </repository>
+        <repository>
+            <id>logblock-repo</id>
+            <url>https://www.iani.de/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
             <releases>
                 <enabled>false</enabled>
             </releases>
             <id>lwc-repo</id>
-            <url>http://repo.dmulloy2.net/nexus/repository/snapshots/</url>
+            <url>https://repo.dmulloy2.net/nexus/repository/snapshots/</url>
         </repository>
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.14.4-R0.1-SNAPSHOT</version>
+            <version>1.17.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -192,6 +196,12 @@
                     <artifactId>WorldGuard</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>de.diddiz</groupId>
+            <artifactId>logblock</artifactId>
+            <version>1.17.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>de.themoep</groupId>

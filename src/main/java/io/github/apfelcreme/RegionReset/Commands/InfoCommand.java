@@ -7,7 +7,7 @@ import io.github.apfelcreme.RegionReset.Blueprint;
 import io.github.apfelcreme.RegionReset.RegionManager;
 import io.github.apfelcreme.RegionReset.RegionReset;
 import io.github.apfelcreme.RegionReset.RegionResetConfig;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -78,20 +78,18 @@ public class InfoCommand implements SubCommand {
                                     .replace("{1}", blueprint.getName()));
                             List<UUID> members = new ArrayList<>(region.getOwners().getUniqueIds());
                             members.addAll(new ArrayList<>(region.getMembers().getUniqueIds()));
-                            for (UUID uuid : members) {
-                                long lastLogout = 0;
-                                OfflinePlayer member = RegionReset.getInstance().getServer().getOfflinePlayer(uuid);
-                                if (member != null && member.hasPlayedBefore()) {
-                                    lastLogout = member.getLastPlayed();
+                            Bukkit.getScheduler().runTaskAsynchronously(RegionReset.getInstance(), () -> {
+                                for (UUID uuid : members) {
+                                    long lastLogout = RegionReset.getInstance().getLastSeen(uuid);
+                                    String offlineTime = RegionReset.formatTimeDifference(new Date().getTime() - lastLogout);
+                                    String name = RegionReset.getInstance().getNameByUUID(uuid);
+                                    if (name != null) {
+                                        RegionReset.sendMessage(sender, RegionResetConfig.getText("info.info.member")
+                                                .replace("{0}", name)
+                                                .replace("{1}", offlineTime));
+                                    }
                                 }
-                                String offlineTime = RegionReset.formatTimeDifference(new Date().getTime() - lastLogout);
-                                String name = RegionReset.getInstance().getNameByUUID(uuid);
-                                if (name != null) {
-                                    RegionReset.sendMessage(sender, RegionResetConfig.getText("info.info.member")
-                                            .replace("{0}", name)
-                                            .replace("{1}", offlineTime));
-                                }
-                            }
+                            });
                         } else {
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("error.regionNotAssigned"));
                         }

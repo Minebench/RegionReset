@@ -3,12 +3,14 @@ package io.github.apfelcreme.RegionReset;
 import com.griefcraft.lwc.LWC;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.util.profile.Profile;
+import de.diddiz.LogBlock.LogBlock;
 import de.minebench.plotsigns.PlotSigns;
 import de.themoep.minedown.MineDown;
 import io.github.apfelcreme.RegionReset.Listener.ItemRightclickListener;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.zaiyers.UUIDDB.core.UUIDDBPlugin;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.simple.JSONArray;
@@ -19,6 +21,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -120,6 +126,35 @@ public class RegionReset extends JavaPlugin {
     }
 
     /**
+     * Get the last time a player was seen
+     * @param playerId ID of the player
+     * @return THe timestamp
+     */
+    public long getLastSeen(UUID playerId) {
+        if (getServer().getPluginManager().isPluginEnabled("LogBlock")) {
+            try (Connection conn = LogBlock.getInstance().getConnection()) {
+                PreparedStatement sta = conn.prepareStatement("SELECT UNIX_TIMESTAMP(lastlogin) FROM `lb-players` WHERE UUID=?;");
+                sta.setString(1, playerId.toString());
+                ResultSet rs = sta.executeQuery();
+                if (rs.next()) {
+                    long lastLogin = rs.getLong(1);
+                    if (lastLogin > 0) {
+                        return lastLogin;
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        OfflinePlayer player = RegionReset.getInstance().getServer().getOfflinePlayer(playerId);
+        if (player != null && player.getName() != null) {
+            return player.getLastSeen();
+        }
+        return 0;
+    }
+
+    /**
      * sends a message to a player
      *
      * @param player  the player the message shall be sent to
@@ -214,6 +249,18 @@ public class RegionReset extends JavaPlugin {
         }
         if (name == null) {
             name = uuidCache.get(uuid);
+        }
+        if (name == null && getServer().getPluginManager().isPluginEnabled("LogBlock")) {
+            try (Connection conn = LogBlock.getInstance().getConnection()) {
+                PreparedStatement sta = conn.prepareStatement("SELECT playername FROM `lb-players` WHERE UUID=?;");
+                sta.setString(1, uuid.toString());
+                ResultSet rs = sta.executeQuery();
+                if (rs.next()) {
+                    name = rs.getString("playername");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         if (name == null) {
