@@ -128,7 +128,7 @@ public class RegionReset extends JavaPlugin {
     /**
      * Get the last time a player was seen
      * @param playerId ID of the player
-     * @return THe timestamp
+     * @return The timestamp in milliseconds
      */
     public long getLastSeen(UUID playerId) {
         if (getServer().getPluginManager().isPluginEnabled("LogBlock")) {
@@ -139,7 +139,7 @@ public class RegionReset extends JavaPlugin {
                 if (rs.next()) {
                     long lastLogin = rs.getLong(1);
                     if (lastLogin > 0) {
-                        return lastLogin;
+                        return lastLogin * 1000;
                     }
                 }
             } catch (SQLException e) {
