@@ -140,7 +140,7 @@ public class RegionManager {
      */
     public void reloadBlueprintConfig() {
         blueprintConfig = YamlConfiguration.loadConfiguration(blueprintConfigFile);
-        saveBlueprintConfig();
+        blueprints = loadBlueprints();
     }
 
     /**
