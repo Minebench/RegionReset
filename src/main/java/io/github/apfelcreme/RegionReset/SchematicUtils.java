@@ -27,7 +27,6 @@ import de.minebench.plotsigns.PlotSigns;
 import io.github.apfelcreme.RegionReset.Exceptions.ChunkNotLoadedException;
 import io.github.apfelcreme.RegionReset.Exceptions.DifferentRegionSizeException;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -36,6 +35,7 @@ import org.bukkit.block.data.type.WallSign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -328,5 +328,16 @@ public class SchematicUtils {
                         , false);
             });
         }
+    }
+
+    public static void removeEntities(CommandSender sender, ProtectedRegion region, World world) {
+        int removedEntitiesCount = 0;
+        for (Entity entity : world.getEntities()) {
+            if (region.contains(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ())) {
+                entity.remove();
+                removedEntitiesCount++;
+            }
+        }
+        sender.sendMessage("Removed " + removedEntitiesCount + " entities from the region");
     }
 }

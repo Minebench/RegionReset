@@ -250,6 +250,7 @@ public class RegionManager {
                         File backupFile = new File(plugin.getDataFolder()
                                 + "/backups/" + world.getName() + "/" + region.getId() + ".schematic");
                         SchematicUtils.saveSchematic(backupFile, region, world);
+                        SchematicUtils.removeEntities(sender, region, world);
                         SchematicUtils.pasteBlueprint(blueprint.getBlueprintFile(), false, region, world);
                         if (plugin.getPlotSigns() != null) {
                             SchematicUtils.buildPlotSignsSign(sender, region, world);
