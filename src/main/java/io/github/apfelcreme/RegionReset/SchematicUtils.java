@@ -36,6 +36,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -331,13 +332,14 @@ public class SchematicUtils {
     }
 
     public static void removeEntities(CommandSender sender, ProtectedRegion region, World world) {
-        int removedEntitiesCount = 0;
         for (Entity entity : world.getEntities()) {
-            if (region.contains(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ())) {
-                entity.remove();
-                removedEntitiesCount++;
+            if (!(entity instanceof Player) && region.contains(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ())) {
+                try {
+                    entity.remove();
+                } catch (UnsupportedOperationException e) {
+                    sender.sendMessage("Can't remove entity " + entity.getType() + " at " + entity.getLocation().toBlockLocation().toVector() + ": " + e.getMessage());
+                }
             }
         }
-        sender.sendMessage("Removed " + removedEntitiesCount + " entities from the region");
     }
 }
