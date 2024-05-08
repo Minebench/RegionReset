@@ -283,7 +283,7 @@ public class SchematicUtils {
                     BlockData data = block.getBlockData();
                     if (data instanceof org.bukkit.block.data.type.Sign || data instanceof WallSign) {
                         Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
-                        if (tempSign.getLines()[0].equals(signSellLine)) {
+                        if (tempSign.getLines()[0].equalsIgnoreCase(signSellLine)) {
                             signs.add(tempSign);
                         }
                     }
@@ -307,7 +307,7 @@ public class SchematicUtils {
                         for (int i = 0; i < 4; i++) {
                             sign.setLine(i, "");
                         }
-                        sign.update();
+                        sign.update(true, false);
                     }
                 }
 
