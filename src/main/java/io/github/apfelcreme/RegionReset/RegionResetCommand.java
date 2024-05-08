@@ -86,6 +86,9 @@ public class RegionResetCommand implements CommandExecutor {
                     case SAVE:
                         subCommand = new SaveCommand();
                         break;
+                    case UPDATE:
+                        subCommand = new UpdateCommand();
+                        break;
                 }
             } else {
                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.unknownCommand")
@@ -117,7 +120,8 @@ public class RegionResetCommand implements CommandExecutor {
         RELOAD,
         RESET,
         RESTORE,
-        SAVE;
+        SAVE,
+        UPDATE;
 
         private final boolean playerCommand;
 

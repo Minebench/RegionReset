@@ -315,7 +315,7 @@ public class RegionManager {
     }
 
     /**
-     * defines a new Blueprint
+     * defines (or updates) a new Blueprint
      *
      * @param sender        the player that does the action
      * @param selection     the players current WorldEdit selection
@@ -340,12 +340,15 @@ public class RegionManager {
                     blueprintConfig.createSection(sender.getWorld().getName());
                 }
                 ConfigurationSection worldConfig = blueprintConfig.getConfigurationSection(sender.getWorld().getName());
-                worldConfig.set(blueprint.getName(), new ArrayList<>());
+                boolean existed = worldConfig.isList(blueprint.getName());
+                if (!existed) {
+                    worldConfig.set(blueprint.getName(), new ArrayList<>());
+                }
                 saveBlueprintConfig();
 
                 blueprints.add(blueprint);
                 plugin.getLogger().info("Blueprint '" + blueprintName + "' in World '" + sender.getWorld().getName()
-                        + "' has been defined by " + sender.getName() + "'");
+                        + "' has been " + (existed ? "updated" : "defined") + " by " + sender.getName() + "'");
 
 
             } else {

@@ -75,3 +75,5 @@ texts:
     rightClick: '&eApplicable blueprint for region {0}: {1}'
     save:
       saved: '&a Die Region &2{0}&a wurde erfolgreich gespeichert. Du kannst sie jederzeit mit /rr restore <Region> zurücksetzen!'
+    update:
+      updated: '&a Du hast den Blueprint &2{0}&a erfolgreich geupdated'

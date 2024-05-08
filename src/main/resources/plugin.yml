@@ -31,6 +31,7 @@ permissions:
       RegionReset.reset: true
       RegionReset.restore: true
       RegionReset.save: true
+      RegionReset.update: true
   RegionReset.add:
     description: add a region to a blueprint
   RegionReset.blueprints:
@@ -53,3 +54,5 @@ permissions:
     description: restore a region to a blueprint
   RegionReset.save:
     description: saves a region
+  RegionReset.update:
+    description: updates a blueprint
