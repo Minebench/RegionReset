@@ -105,6 +105,7 @@ public class RegionManager {
                 ConfigurationSection worldConfig = blueprintConfig.getConfigurationSection(worldName);
                 for (String blueprintName : worldConfig.getKeys(true)) {
                     List<String> regionNames = worldConfig.getStringList(blueprintName);
+                    regionNames.sort(String::compareTo);
                     List<ProtectedRegion> blueprintRegions = new ArrayList<>();
                     File blueprintFile = new File(plugin.getDataFolder() + "/blueprints/"
                             + world.getName() + "/" + blueprintName + ".schematic");
