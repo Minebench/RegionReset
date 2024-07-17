@@ -32,6 +32,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -96,11 +97,11 @@ public class SchematicUtils {
 
             Clipboard clipboard = reader.read();
 
-            int length = Math.abs(region.getMaximumPoint().getBlockX() - region.getMinimumPoint().getBlockX()) + 1;
-            int height = Math.abs(region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY()) + 1;
-            int width = Math.abs(region.getMaximumPoint().getBlockZ() - region.getMinimumPoint().getBlockZ()) + 1;
+            int length = Math.abs(region.getMaximumPoint().x() - region.getMinimumPoint().x()) + 1;
+            int height = Math.abs(region.getMaximumPoint().y() - region.getMinimumPoint().y()) + 1;
+            int width = Math.abs(region.getMaximumPoint().z() - region.getMinimumPoint().z()) + 1;
 
-            if (width != clipboard.getDimensions().getBlockX() || height != clipboard.getDimensions().getBlockY() || length != clipboard.getDimensions().getBlockZ()) {
+            if (width != clipboard.getDimensions().x() || height != clipboard.getDimensions().y() || length != clipboard.getDimensions().z()) {
                 throw new DifferentRegionSizeException(region.getId(), schematicFile.getName());
             }
             
@@ -202,15 +203,15 @@ public class SchematicUtils {
     
     private static void loadChunks(World world, ProtectedRegion region) throws ChunkNotLoadedException {
         loadChunks(world,
-                region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockZ(),
-                region.getMaximumPoint().getBlockX(), region.getMaximumPoint().getBlockZ());
+                region.getMinimumPoint().x(), region.getMinimumPoint().z(),
+                region.getMaximumPoint().x(), region.getMaximumPoint().z());
     }
     
     private static void loadChunks(Region selection) throws ChunkNotLoadedException {
         if (selection.getWorld() != null) {
             loadChunks(BukkitAdapter.adapt(selection.getWorld()),
-                    selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockZ(),
-                    selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockZ());
+                    selection.getMinimumPoint().x(), selection.getMinimumPoint().z(),
+                    selection.getMaximumPoint().x(), selection.getMaximumPoint().z());
         }
     }
 
@@ -277,14 +278,14 @@ public class SchematicUtils {
             List<Sign> signs = new ArrayList<>();
 
             String signSellLine = RegionReset.getInstance().getPlotSigns().getSellLine();
-            for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
-                for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
-                    for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
+            for (int x = region.getMinimumPoint().x(); x <= region.getMaximumPoint().x(); x++) {
+                for (int y = region.getMinimumPoint().y(); y <= region.getMaximumPoint().y(); y++) {
+                    for (int z = region.getMinimumPoint().z(); z <= region.getMaximumPoint().z(); z++) {
                         Block block = world.getBlockAt(x, y, z);
                         BlockData data = block.getBlockData();
                         if (data instanceof org.bukkit.block.data.type.Sign || data instanceof WallSign) {
                             Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
-                            if (tempSign.getLines()[0].equalsIgnoreCase(signSellLine)) {
+                            if (tempSign.getSide(Side.FRONT).getLines()[0].equalsIgnoreCase(signSellLine)) {
                                 signs.add(tempSign);
                             }
                         }
@@ -298,14 +299,14 @@ public class SchematicUtils {
                     String[] lines = plotSigns.getSignLines(region);
                     for (Sign sign : signs) {
                         for (int i = 0; i < lines.length; i++) {
-                            sign.setLine(i, lines[i]);
+                            sign.getSide(Side.FRONT).setLine(i, lines[i]);
                         }
                         sign.update();
                     }
                 } else {
                     for (Sign sign : signs) {
                         for (int i = 0; i < 4; i++) {
-                            sign.setLine(i, "");
+                            sign.getSide(Side.FRONT).setLine(i, "");
                         }
                         sign.update(true, false);
                     }
@@ -319,12 +320,12 @@ public class SchematicUtils {
             Bukkit.getScheduler().runTaskAsynchronously(RegionReset.getInstance(), () -> {
                 LWC.getInstance().fastRemoveProtections(sender,
                         "world = '" + world.getName() + "'"
-                                + " AND x >= " + region.getMinimumPoint().getBlockX()
-                                + " AND y >= " + region.getMinimumPoint().getBlockY()
-                                + " AND z >= " + region.getMinimumPoint().getBlockZ()
-                                + " AND x <= " + region.getMaximumPoint().getBlockX()
-                                + " AND y <= " + region.getMaximumPoint().getBlockY()
-                                + " AND z <= " + region.getMaximumPoint().getBlockZ()
+                                + " AND x >= " + region.getMinimumPoint().x()
+                                + " AND y >= " + region.getMinimumPoint().y()
+                                + " AND z >= " + region.getMinimumPoint().z()
+                                + " AND x <= " + region.getMaximumPoint().x()
+                                + " AND y <= " + region.getMaximumPoint().y()
+                                + " AND z <= " + region.getMaximumPoint().z()
                         , false);
             });
         }
