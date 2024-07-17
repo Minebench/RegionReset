@@ -273,25 +273,25 @@ public class SchematicUtils {
             return;
         }
 
-        List<Sign> signs = new ArrayList<>();
+        Bukkit.getScheduler().runTask(RegionReset.getInstance(), () -> {
+            List<Sign> signs = new ArrayList<>();
 
-        String signSellLine = RegionReset.getInstance().getPlotSigns().getSellLine();
-        for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
-            for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
-                for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
-                    Block block = world.getBlockAt(x, y, z);
-                    BlockData data = block.getBlockData();
-                    if (data instanceof org.bukkit.block.data.type.Sign || data instanceof WallSign) {
-                        Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
-                        if (tempSign.getLines()[0].equalsIgnoreCase(signSellLine)) {
-                            signs.add(tempSign);
+            String signSellLine = RegionReset.getInstance().getPlotSigns().getSellLine();
+            for (int x = region.getMinimumPoint().getBlockX(); x <= region.getMaximumPoint().getBlockX(); x++) {
+                for (int y = region.getMinimumPoint().getBlockY(); y <= region.getMaximumPoint().getBlockY(); y++) {
+                    for (int z = region.getMinimumPoint().getBlockZ(); z <= region.getMaximumPoint().getBlockZ(); z++) {
+                        Block block = world.getBlockAt(x, y, z);
+                        BlockData data = block.getBlockData();
+                        if (data instanceof org.bukkit.block.data.type.Sign || data instanceof WallSign) {
+                            Sign tempSign = (Sign) world.getBlockAt(x, y, z).getState();
+                            if (tempSign.getLines()[0].equalsIgnoreCase(signSellLine)) {
+                                signs.add(tempSign);
+                            }
                         }
                     }
                 }
             }
-        }
-        if (signs.size() > 0) {
-            Bukkit.getScheduler().runTask(RegionReset.getInstance(), () -> {
+            if (!signs.isEmpty()) {
                 if (RegionReset.getInstance().getPlotSigns() != null && region.getFlag(PlotSigns.BUYABLE_FLAG) != null && region.getFlag(PlotSigns.PRICE_FLAG) != null) {
                     PlotSigns plotSigns = RegionReset.getInstance().getPlotSigns();
                     region.setFlag(PlotSigns.BUYABLE_FLAG, true);
@@ -310,9 +310,8 @@ public class SchematicUtils {
                         sign.update(true, false);
                     }
                 }
-
-            });
-        }
+            }
+        });
     }
 
     public static void removeProtections(CommandSender sender, ProtectedRegion region, World world) {
