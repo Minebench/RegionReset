@@ -88,8 +88,8 @@ public class ResetCommand implements SubCommand {
                                 RegionReset.getInstance().getLogger().log(Level.SEVERE, e.getException().getMessage(), e.getException());
                             } catch (DifferentRegionSizeException e) {
                                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.differentSize")
-                                        .replace("{0}", e.getRegionName())
-                                        .replace("{1}", e.getBlueprintName()));
+                                        .replace("{0}", e.getRegionName() + " " + e.getRegionSize())
+                                        .replace("{1}", e.getBlueprintName()) + " " + e.getBlueprintSize());
                             } catch (NonCuboidRegionException e) {
                                 RegionReset.sendMessage(sender, RegionResetConfig.getText("error.noCuboidRegion"));
                             } catch (ChunkNotLoadedException e) {

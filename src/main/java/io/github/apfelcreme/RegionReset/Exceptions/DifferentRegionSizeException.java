@@ -1,5 +1,8 @@
 package io.github.apfelcreme.RegionReset.Exceptions;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import org.bukkit.util.BlockVector;
+
 /**
  * Plugin zum Reset von WorldGuard-Regionen mit einer Standard-Region
  * RegionReset
@@ -22,12 +25,16 @@ package io.github.apfelcreme.RegionReset.Exceptions;
  */
 public class DifferentRegionSizeException extends Throwable {
 
-    private String regionName;
-    private String blueprintName;
+    private final String regionName;
+    private final String blueprintName;
+    private final BlockVector3 regionSize;
+    private final BlockVector3 blueprintSize;
 
-    public DifferentRegionSizeException(String regionName, String blueprintName) {
+    public DifferentRegionSizeException(String regionName, String blueprintName, BlockVector3 regionSize, BlockVector3 blueprintSize) {
         this.regionName = regionName;
         this.blueprintName = blueprintName;
+        this.regionSize = regionSize;
+        this.blueprintSize = blueprintSize;
     }
 
     /**
@@ -48,5 +55,21 @@ public class DifferentRegionSizeException extends Throwable {
         return blueprintName;
     }
 
+    /**
+     * returns the region size in the width, height and depth order
+     *
+     * @return the region size
+     */
+    public BlockVector3 getRegionSize() {
+        return regionSize;
+    }
 
+    /**
+     * returns the blueprint size in the width, height and depth order
+     *
+     * @return the blueprint size
+     */
+    public BlockVector3 getBlueprintSize() {
+        return blueprintSize;
+    }
 }

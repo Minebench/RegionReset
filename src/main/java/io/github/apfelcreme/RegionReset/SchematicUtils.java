@@ -18,6 +18,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -102,7 +103,12 @@ public class SchematicUtils {
             int width = Math.abs(region.getMaximumPoint().z() - region.getMinimumPoint().z()) + 1;
 
             if (width != clipboard.getDimensions().x() || height != clipboard.getDimensions().y() || length != clipboard.getDimensions().z()) {
-                throw new DifferentRegionSizeException(region.getId(), schematicFile.getName());
+                BlockVector3 regionSize = new BlockVector3(
+                        width,
+                        height,
+                        length
+                );
+                throw new DifferentRegionSizeException(region.getId(), schematicFile.getName(), regionSize, clipboard.getDimensions());
             }
             
             loadChunks(world, region);

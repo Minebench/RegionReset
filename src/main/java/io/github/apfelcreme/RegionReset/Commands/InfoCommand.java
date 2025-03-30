@@ -1,6 +1,7 @@
 package io.github.apfelcreme.RegionReset.Commands;
 
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.apfelcreme.RegionReset.Blueprint;
@@ -73,8 +74,13 @@ public class InfoCommand implements SubCommand {
                     if (region != null) {
                         Blueprint blueprint = RegionManager.getInstance().getBlueprint(world, region);
                         if (blueprint != null) {
+                            BlockVector3 regionSize = new BlockVector3(
+                                    region.getMaximumPoint().x() - region.getMinimumPoint().x(),
+                                    region.getMaximumPoint().y() - region.getMinimumPoint().y(),
+                                    region.getMaximumPoint().z() - region.getMinimumPoint().z()
+                            );
                             RegionReset.sendMessage(sender, RegionResetConfig.getText("info.info.info")
-                                    .replace("{0}", regionName)
+                                    .replace("{0}", regionName + " " + regionSize)
                                     .replace("{1}", blueprint.getName()));
                             List<UUID> members = new ArrayList<>(region.getOwners().getUniqueIds());
                             members.addAll(new ArrayList<>(region.getMembers().getUniqueIds()));
